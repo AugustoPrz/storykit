@@ -207,27 +207,29 @@ export default function Create() {
       </div>
 
       <div className="create__input-bar">
-        <textarea
-          ref={inputRef}
-          className="create__input"
-          placeholder="Describe your story..."
-          value={input}
-          rows={1}
-          onChange={(e) => {
-            setInput(e.target.value);
-            e.target.style.height = 'auto';
-            e.target.style.height = e.target.scrollHeight + 'px';
-          }}
-          onKeyDown={handleKeyDown}
-          disabled={isWorking}
-        />
-        <button
-          className="create__send"
-          onClick={() => handleSend()}
-          disabled={!input.trim() || isWorking}
-        >
+        <div className="create__input-wrap">
+          <textarea
+            ref={inputRef}
+            className="create__input"
+            placeholder="Describe your story..."
+            value={input}
+            rows={1}
+            onChange={(e) => {
+              setInput(e.target.value);
+              e.target.style.height = 'auto';
+              e.target.style.height = e.target.scrollHeight + 'px';
+            }}
+            onKeyDown={handleKeyDown}
+            disabled={isWorking}
+          />
+          <button
+            className="create__send"
+            onClick={() => handleSend()}
+            disabled={!input.trim() || isWorking}
+          >
           GO
         </button>
+        </div>
       </div>
     </div>
   );

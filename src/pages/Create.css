@@ -53,19 +53,26 @@
 .create__input-bar {
   display: flex;
   align-items: flex-end;
-  gap: 8px;
   padding: 12px 20px;
   flex-shrink: 0;
+}
+
+.create__input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  background: var(--border);
+  border-radius: 20px;
+  padding: 4px 4px 4px 14px;
 }
 
 .create__input {
   flex: 1;
   min-width: 0;
-  padding: 10px 14px;
+  padding: 6px 0;
   font-size: 14px;
   color: var(--text);
-  background: var(--border);
-  border-radius: 20px;
+  background: none;
   resize: none;
   overflow-y: hidden;
   line-height: 1.5;
@@ -87,7 +94,7 @@
   font-weight: 700;
   letter-spacing: 2px;
   color: var(--accent);
-  padding: 8px 12px;
+  padding: 6px 12px;
   transition: opacity 150ms linear;
 }
 
