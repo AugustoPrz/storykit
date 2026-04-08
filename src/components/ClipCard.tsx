@@ -14,7 +14,7 @@ export default function ClipCard({ clip, onClick }: Props) {
     <button className="clip-card" onClick={onClick}>
       <div className="clip-card__thumb">
         {clip.videoUrl ? (
-          <video src={clip.videoUrl} preload="metadata" muted />
+          <video src={`${clip.videoUrl}#t=0.1`} preload="metadata" muted playsInline />
         ) : (
           <div className="clip-card__placeholder" />
         )}
