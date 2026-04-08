@@ -9,7 +9,7 @@ import './Create.css';
 export default function Create() {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const {
     chatMessages,
@@ -207,13 +207,17 @@ export default function Create() {
       </div>
 
       <div className="create__input-bar">
-        <input
+        <textarea
           ref={inputRef}
           className="create__input"
-          type="text"
           placeholder="Describe your story..."
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          rows={1}
+          onChange={(e) => {
+            setInput(e.target.value);
+            e.target.style.height = 'auto';
+            e.target.style.height = e.target.scrollHeight + 'px';
+          }}
           onKeyDown={handleKeyDown}
           disabled={isWorking}
         />
