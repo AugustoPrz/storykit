@@ -62,10 +62,11 @@ export default function Create() {
       // Count episode chain length for title numbering
       let episodeNumber = 1;
       if (currentClip?.parentClipId || currentClip?.videoUrl) {
-        let walker = currentClip;
-        while (walker) {
+        let walkerId: string | undefined = currentClip?.id;
+        while (walkerId) {
           episodeNumber++;
-          walker = walker.parentClipId ? clips.find((c) => c.id === walker!.parentClipId) : undefined;
+          const w = clips.find((c) => c.id === walkerId);
+          walkerId = w?.parentClipId;
         }
       }
       const script = await generateScript(
