@@ -63,13 +63,13 @@
   align-items: flex-end;
   background: var(--border);
   border-radius: 20px;
-  padding: 4px 4px 4px 14px;
+  padding: 6px 6px 6px 16px;
 }
 
 .create__input {
   flex: 1;
   min-width: 0;
-  padding: 6px 0;
+  padding: 10px 0;
   font-size: 14px;
   color: var(--text);
   background: none;
