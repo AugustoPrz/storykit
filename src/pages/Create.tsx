@@ -227,7 +227,7 @@ export default function Create() {
             onClick={() => handleSend()}
             disabled={!input.trim() || isWorking}
           >
-          GO
+          CREATE
         </button>
         </div>
       </div>
