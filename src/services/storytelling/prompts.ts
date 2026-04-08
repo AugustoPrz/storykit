@@ -45,23 +45,39 @@ export function buildPrompt(
 ): string {
   if (previousScript) {
     const ep = episodeNumber ?? 2;
+    const isFinalEpisode = ep >= 3;
+
+    const episodeRole = isFinalEpisode
+      ? `This is the FINAL EPISODE (Episode 3 of 3). You MUST:
+- Resolve the central dramatic conflict — give the audience a satisfying or shocking conclusion
+- Do NOT end with a cliffhanger. Set "cliffhanger" to "END" and "hook_for_next" to "END"
+- Deliver the emotional payoff: confession, confrontation, revelation, or consequence
+- Make the last shot feel like a dramatic finale — a door closing, a face in tears, walking away, silence after the storm`
+      : `This is Episode ${ep} of 3 (middle chapter). You MUST:
+- Escalate the tension significantly from Episode ${ep - 1}
+- Introduce a twist, betrayal, or revelation that changes everything
+- End with an even STRONGER cliffhanger than the previous episode`;
+
     return `${SYSTEM_PROMPT}
 
-CONTEXT — Previous episode script (Episode ${ep - 1}):
+CONTEXT — Previous episode script (Episode ${ep - 1} of 3):
 ${JSON.stringify(previousScript, null, 2)}
 
+EPISODE STRUCTURE: ${episodeRole}
+
 CONTINUATION RULES — these are mandatory:
-1. TITLE: Use the SAME base title "${previousScript.title}" and append " — Part ${ep}" (e.g. "${previousScript.title} — Part ${ep}")
-2. CHARACTERS: The SAME characters must appear. Describe them with the EXACT same physical appearance (clothing, hair, face, body type) as the previous episode so the video AI generates consistent-looking people.
+1. TITLE: Use the SAME base title "${previousScript.title}" and append " — Part ${ep}"
+2. CHARACTERS: The SAME characters must appear. Describe them with the EXACT same physical appearance (clothing, hair, face, body type) as the previous episode.
 3. SETTING: Continue in the same location or a directly connected space. Describe the environment consistently.
 4. STYLE: Use the exact same visual style "${previousScript.style}".
 5. PLOT: Pick up DIRECTLY from the cliffhanger: "${previousScript.cliffhanger}". The first shot must be the immediate next moment — do not skip time or reset the scene.
-6. End with a NEW cliffhanger.
 
 User request: ${userMessage}`;
   }
 
   return `${SYSTEM_PROMPT}
+
+This is Episode 1 of a 3-part drama series. Set up compelling characters, a dramatic situation, and end with a strong cliffhanger that demands a continuation.
 
 Create a script for this story idea: ${userMessage}`;
 }

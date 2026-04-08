@@ -28,6 +28,14 @@ export default function Create() {
 
   const currentClip = clips.find((c) => c.id === currentClipId);
   const isWorking = generationStatus.phase === 'scripting' || generationStatus.phase === 'generating';
+  const MAX_EPISODES = 3;
+  // Count videos generated in this chat session
+  const sessionVideoCount = chatMessages.filter((m) => {
+    if (!m.script) return false;
+    const clip = m.clipId ? clips.find((c) => c.id === m.clipId) : currentClip;
+    return clip?.videoUrl;
+  }).length + (currentClip?.videoUrl && !chatMessages.some((m) => m.clipId === currentClipId) ? 1 : 0);
+  const isSeriesComplete = sessionVideoCount >= MAX_EPISODES;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -186,7 +194,7 @@ export default function Create() {
               key={msg.id}
               message={msg}
               onGenerate={showGenerate ? handleGenerate : undefined}
-              onContinue={msgClip?.videoUrl ? handleContinue : undefined}
+              onContinue={msgClip?.videoUrl && !isSeriesComplete ? handleContinue : undefined}
               isGenerating={showGenerating || false}
               generationProgress={generationStatus.progress}
               generationMessage={generationStatus.message}
