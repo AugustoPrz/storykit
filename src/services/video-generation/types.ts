@@ -4,6 +4,7 @@ export interface ScriptShot {
   visual: string;
   audio: string;
   camera: string;
+  dialogue?: string;
 }
 
 export interface Script {

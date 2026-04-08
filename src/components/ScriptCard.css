@@ -68,6 +68,16 @@
   letter-spacing: 1px;
 }
 
+.script-card__shot-dialogue {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  font-style: italic;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
 .script-card__footer {
   margin-bottom: 16px;
 }

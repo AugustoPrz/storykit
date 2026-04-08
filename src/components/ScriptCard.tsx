@@ -49,6 +49,9 @@ export default function ScriptCard({
             <span className="script-card__shot-num">#{shot.shot_number}</span>
             <span className="script-card__shot-detail">{shot.visual}</span>
             <span className="script-card__shot-camera">{shot.camera}</span>
+            {shot.dialogue && (
+              <span className="script-card__shot-dialogue">{shot.dialogue}</span>
+            )}
           </div>
         ))}
       </div>

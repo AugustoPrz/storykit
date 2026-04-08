@@ -11,8 +11,9 @@ The JSON must match this exact schema:
       "shot_number": 1,
       "duration": "string — e.g. '0-5s'",
       "visual": "string — detailed visual description for video gen model, include lighting, mood, action",
-      "audio": "string — narration, dialogue, sound effects, music mood. MUST include voice/narration.",
-      "camera": "string — e.g. 'slow dolly in', 'static wide', 'tracking shot'"
+      "audio": "string — sound effects, ambient sounds, music mood",
+      "camera": "string — e.g. 'slow dolly in', 'static wide', 'tracking shot'",
+      "dialogue": "string or null — exact spoken words by a character in this shot, e.g. '\"No... that can't be right.\"' or null if no dialogue in this shot"
     }
   ],
   "cliffhanger": "string — how this clip ends (tension, surprise, question)",
@@ -29,7 +30,7 @@ DIRECTING RULES — follow these strictly:
   - 3-4 shots: a full micro-narrative with rising tension
 - CAMERA MUST FOLLOW THE ACTION: if a character faces danger ahead, the camera should show the danger or the character's reaction from the front — never show the back of their head during a climactic moment. Cut to a frontal close-up for emotional beats. The camera is your audience's eyes.
 - SHOT TRANSITIONS MUST BE MOTIVATED: each cut should happen because the story demands a new perspective (reveal, reaction, escalation), not arbitrarily.
-- DIALOGUE IS MANDATORY: at least ONE shot must contain spoken dialogue from a character (not just narration). Characters should talk — whisper, shout, cry, confess. This makes the story feel alive. Other shots can use narration or sound design, but dialogue must appear in at least one shot.
+- DIALOGUE IS MANDATORY: at least ONE shot must have a non-null "dialogue" field with exact spoken words from a character. Characters should talk — whisper, shout, cry, confess. This makes the story feel alive. Not every shot needs dialogue, but at least one must have it. Write the dialogue in quotes as the character would say it.
 - End with a strong cliffhanger that makes the viewer want more
 - The style should match the mood of the story
 - Always use aspect_ratio "9:16" (vertical video)
