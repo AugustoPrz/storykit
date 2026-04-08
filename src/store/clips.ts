@@ -51,7 +51,13 @@ export const useClipsStore = create<ClipsState>()(
         })),
 
       clearChat: () =>
-        set({ chatMessages: [], generationStatus: { phase: 'idle', progress: 0, message: '' }, currentClipId: null }),
+        set((state) => ({
+          chatMessages: [],
+          generationStatus: { phase: 'idle', progress: 0, message: '' },
+          currentClipId: null,
+          // Remove clips without videos (draft scripts from this session)
+          clips: state.clips.filter((c) => c.videoUrl),
+        })),
 
       setGenerationStatus: (status) =>
         set({ generationStatus: status }),
