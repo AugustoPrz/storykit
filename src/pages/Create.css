@@ -89,12 +89,13 @@
 
 .create__send {
   flex-shrink: 0;
+  align-self: center;
   font-family: var(--mono);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 2px;
   color: var(--accent);
-  padding: 6px 12px;
+  padding: 0 12px;
   transition: opacity 150ms linear;
 }
 
