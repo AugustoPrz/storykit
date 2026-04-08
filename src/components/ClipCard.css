@@ -2,6 +2,8 @@
   border: 0.5px solid var(--border);
   text-align: left;
   width: 100%;
+  min-width: 0;
+  overflow: hidden;
   transition: border-color 150ms linear;
   padding: 0;
 }
