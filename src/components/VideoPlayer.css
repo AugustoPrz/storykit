@@ -1,0 +1,12 @@
+.video-player {
+  width: 100%;
+  background: #000;
+}
+
+.video-player__video {
+  width: 100%;
+  display: block;
+  max-height: 400px;
+  object-fit: contain;
+  background: #000;
+}

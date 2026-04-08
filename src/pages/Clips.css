@@ -1,0 +1,38 @@
+.clips {
+  height: 100%;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+
+.clips--empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.clips__empty-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--dim);
+}
+
+.clips__empty-link {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  transition: opacity 150ms linear;
+}
+
+.clips__empty-link:hover {
+  opacity: 0.7;
+}
+
+.clips__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}

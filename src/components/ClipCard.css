@@ -1,0 +1,64 @@
+.clip-card {
+  border: 0.5px solid var(--border);
+  text-align: left;
+  width: 100%;
+  transition: border-color 150ms linear;
+  padding: 0;
+}
+
+.clip-card:hover {
+  border-color: var(--text);
+}
+
+.clip-card__thumb {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.clip-card__thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.clip-card__placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--surface);
+}
+
+.clip-card__duration {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.7);
+  padding: 2px 4px;
+}
+
+.clip-card__info {
+  padding: 8px;
+}
+
+.clip-card__title {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.clip-card__time {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 1px;
+}
