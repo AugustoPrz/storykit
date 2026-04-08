@@ -1,17 +1,28 @@
 import { Routes, Route, NavLink, useLocation } from 'react-router-dom';
+import { useClipsStore } from './store/clips';
 import Create from './pages/Create';
 import Clips from './pages/Clips';
 import ClipPlayer from './pages/ClipPlayer';
 import './App.css';
 
+const USD_PER_CREDIT = 10 / 680;
+
 export default function App() {
   const location = useLocation();
   const isPlayerOpen = location.pathname.startsWith('/clip/');
+  const creditsUsed = useClipsStore((s) => s.creditsUsed);
+  const clipCount = useClipsStore((s) => s.clips.filter((c) => c.videoUrl).length);
 
   return (
     <div className="app">
       <header className="app-header">
         <span className="app-title">STORYKIT</span>
+        {creditsUsed > 0 && (
+          <span className="app-credits">
+            {creditsUsed.toFixed(1)} CR · ${(creditsUsed * USD_PER_CREDIT).toFixed(2)}
+            {clipCount > 0 && ` · ${clipCount} clip${clipCount !== 1 ? 's' : ''}`}
+          </span>
+        )}
       </header>
 
       <main className="app-content">

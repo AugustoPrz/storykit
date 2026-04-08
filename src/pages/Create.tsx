@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useClipsStore } from '../store/clips';
 import { generateScript } from '../services/storytelling/gemini';
-import { generateVideo } from '../services/video-generation/mock';
+import { generateVideo } from '../services/video-generation';
 import ChatMessage from '../components/ChatMessage';
 import type { ChatMessage as ChatMessageType } from '../services/video-generation/types';
 import './Create.css';
@@ -23,6 +23,7 @@ export default function Create() {
     updateClip,
     setCurrentClipId,
     clips,
+    addCredits,
   } = useClipsStore();
 
   const currentClip = clips.find((c) => c.id === currentClipId);
@@ -58,7 +59,20 @@ export default function Create() {
 
     try {
       const previousScript = currentClip?.script;
-      const script = await generateScript(text, previousScript);
+      // Count episode chain length for title numbering
+      let episodeNumber = 1;
+      if (currentClip?.parentClipId || currentClip?.videoUrl) {
+        let walker = currentClip;
+        while (walker) {
+          episodeNumber++;
+          walker = walker.parentClipId ? clips.find((c) => c.id === walker!.parentClipId) : undefined;
+        }
+      }
+      const script = await generateScript(
+        text,
+        previousScript,
+        previousScript ? episodeNumber : undefined
+      );
 
       updateMessage(assistantMsgId, {
         content: '',
@@ -93,11 +107,26 @@ export default function Create() {
     setGenerationStatus({ phase: 'generating', progress: 0, message: 'ANALYZING SCRIPT...' });
 
     try {
-      const result = await generateVideo(currentClip.script, (progress, message) => {
-        setGenerationStatus({ phase: 'generating', progress, message });
-      });
+      // If this is a continuation clip, pass parent's video URL for O3 reference
+      const parentClip = currentClip.parentClipId
+        ? clips.find((c) => c.id === currentClip.parentClipId)
+        : undefined;
+      const referenceVideoUrl = parentClip?.videoUrl || undefined;
 
-      updateClip(currentClipId, { videoUrl: result.video_url });
+      const result = await generateVideo(
+        currentClip.script,
+        (progress, message) => {
+          setGenerationStatus({ phase: 'generating', progress, message });
+        },
+        referenceVideoUrl
+      );
+
+      updateClip(currentClipId, {
+        videoUrl: result.video_url,
+      });
+      if (result.credits_used) {
+        addCredits(result.credits_used);
+      }
       setGenerationStatus({ phase: 'complete', progress: 1, message: 'DONE' });
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Generation failed';
@@ -152,6 +181,7 @@ export default function Create() {
               isGenerating={showGenerating || false}
               generationProgress={generationStatus.progress}
               generationMessage={generationStatus.message}
+              generationError={generationStatus.phase === 'error' ? generationStatus.message : undefined}
               videoUrl={msgClip?.videoUrl || undefined}
             />
           );

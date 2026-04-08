@@ -27,6 +27,7 @@ export interface ClipMetadata {
   createdAt: string;
   style: string;
   parentClipId?: string;
+  referenceImageUrl?: string;
 }
 
 export interface ChatMessage {
@@ -57,4 +58,5 @@ export interface VideoGenerationResponse {
   thumbnail_url: string;
   duration_seconds: number;
   generation_time_ms: number;
+  credits_used?: number;
 }

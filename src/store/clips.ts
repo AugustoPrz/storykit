@@ -7,6 +7,7 @@ interface ClipsState {
   chatMessages: ChatMessage[];
   generationStatus: GenerationStatus;
   currentClipId: string | null;
+  creditsUsed: number;
 
   addClip: (clip: ClipMetadata) => void;
   updateClip: (id: string, updates: Partial<ClipMetadata>) => void;
@@ -16,6 +17,7 @@ interface ClipsState {
   clearChat: () => void;
   setGenerationStatus: (status: GenerationStatus) => void;
   setCurrentClipId: (id: string | null) => void;
+  addCredits: (amount: number) => void;
 }
 
 export const useClipsStore = create<ClipsState>()(
@@ -25,6 +27,7 @@ export const useClipsStore = create<ClipsState>()(
       chatMessages: [],
       generationStatus: { phase: 'idle', progress: 0, message: '' },
       currentClipId: null,
+      creditsUsed: 0,
 
       addClip: (clip) =>
         set((state) => ({ clips: [clip, ...state.clips] })),
@@ -55,10 +58,13 @@ export const useClipsStore = create<ClipsState>()(
 
       setCurrentClipId: (id) =>
         set({ currentClipId: id }),
+
+      addCredits: (amount) =>
+        set((state) => ({ creditsUsed: state.creditsUsed + amount })),
     }),
     {
       name: 'storykit-clips',
-      partialize: (state) => ({ clips: state.clips }),
+      partialize: (state) => ({ clips: state.clips, creditsUsed: state.creditsUsed }),
     }
   )
 );

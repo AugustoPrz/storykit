@@ -9,6 +9,7 @@ interface Props {
   isGenerating?: boolean;
   generationProgress?: number;
   generationMessage?: string;
+  generationError?: string;
   videoUrl?: string;
 }
 
@@ -19,6 +20,7 @@ export default function ChatMessage({
   isGenerating,
   generationProgress,
   generationMessage,
+  generationError,
   videoUrl,
 }: Props) {
   if (message.role === 'system') {
@@ -53,6 +55,7 @@ export default function ChatMessage({
           isGenerating={isGenerating}
           generationProgress={generationProgress}
           generationMessage={generationMessage}
+          generationError={generationError}
           videoUrl={videoUrl}
           onContinue={onContinue}
         />

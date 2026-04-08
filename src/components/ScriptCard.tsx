@@ -10,6 +10,7 @@ interface Props {
   isGenerating?: boolean;
   generationProgress?: number;
   generationMessage?: string;
+  generationError?: string;
   videoUrl?: string;
 }
 
@@ -20,6 +21,7 @@ export default function ScriptCard({
   isGenerating,
   generationProgress = 0,
   generationMessage = '',
+  generationError,
   videoUrl,
 }: Props) {
   return (
@@ -67,11 +69,18 @@ export default function ScriptCard({
         </div>
       ) : isGenerating ? (
         <GenerationProgress progress={generationProgress} message={generationMessage} />
-      ) : onGenerate ? (
-        <button className="script-card__generate" onClick={onGenerate}>
-          GENERATE VIDEO
-        </button>
-      ) : null}
+      ) : (
+        <>
+          {generationError && (
+            <div className="script-card__error">{generationError}</div>
+          )}
+          {onGenerate && (
+            <button className="script-card__generate" onClick={onGenerate}>
+              {generationError ? 'RETRY' : 'GENERATE VIDEO'}
+            </button>
+          )}
+        </>
+      )}
     </div>
   );
 }

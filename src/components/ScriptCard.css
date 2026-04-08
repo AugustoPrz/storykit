@@ -72,6 +72,16 @@
   margin-bottom: 16px;
 }
 
+.script-card__error {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent);
+  line-height: 1.4;
+  padding: 8px 0;
+  margin-bottom: 8px;
+  word-break: break-word;
+}
+
 .script-card__generate {
   width: 100%;
   padding: 12px;
