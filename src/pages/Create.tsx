@@ -33,8 +33,8 @@ export default function Create() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages, generationStatus]);
 
-  const handleSend = async () => {
-    const text = input.trim();
+  const handleSend = async (overrideText?: string) => {
+    const text = (overrideText ?? input).trim();
     if (!text || isWorking) return;
 
     setInput('');
@@ -58,21 +58,16 @@ export default function Create() {
     setGenerationStatus({ phase: 'scripting', progress: 0, message: 'WRITING SCRIPT...' });
 
     try {
-      const previousScript = currentClip?.script;
-      // Count episode chain length for title numbering
-      let episodeNumber = 1;
-      if (currentClip?.parentClipId || currentClip?.videoUrl) {
-        let walkerId: string | undefined = currentClip?.id;
-        while (walkerId) {
-          episodeNumber++;
-          const w = clips.find((c) => c.id === walkerId);
-          walkerId = w?.parentClipId;
-        }
-      }
+      // Use the last clip with a generated video as the reference script
+      const lastVideoClip = clips.find((c) => c.videoUrl);
+      const previousScript = lastVideoClip?.script ?? currentClip?.script;
+      // Count how many clips have videos for episode numbering
+      const videoClipCount = clips.filter((c) => c.videoUrl).length;
+      const episodeNumber = videoClipCount + 1;
       const script = await generateScript(
         text,
-        previousScript,
-        previousScript ? episodeNumber : undefined
+        lastVideoClip ? previousScript : undefined,
+        lastVideoClip ? episodeNumber : undefined
       );
 
       updateMessage(assistantMsgId, {
@@ -108,11 +103,9 @@ export default function Create() {
     setGenerationStatus({ phase: 'generating', progress: 0, message: 'ANALYZING SCRIPT...' });
 
     try {
-      // If this is a continuation clip, pass parent's video URL for O3 reference
-      const parentClip = currentClip.parentClipId
-        ? clips.find((c) => c.id === currentClip.parentClipId)
-        : undefined;
-      const referenceVideoUrl = parentClip?.videoUrl || undefined;
+      // Use the most recently generated video as O3 reference (not parent chain)
+      const lastVideoClip = clips.find((c) => c.videoUrl);
+      const referenceVideoUrl = lastVideoClip?.videoUrl || undefined;
 
       const result = await generateVideo(
         currentClip.script,
@@ -136,8 +129,7 @@ export default function Create() {
   };
 
   const handleContinue = () => {
-    setInput('Continue the story');
-    inputRef.current?.focus();
+    handleSend('Continue the story');
   };
 
   const handleNew = () => {
@@ -203,7 +195,7 @@ export default function Create() {
         />
         <button
           className="create__send"
-          onClick={handleSend}
+          onClick={() => handleSend()}
           disabled={!input.trim() || isWorking}
         >
           GO

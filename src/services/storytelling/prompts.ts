@@ -29,7 +29,7 @@ DIRECTING RULES — follow these strictly:
   - 3-4 shots: a full micro-narrative with rising tension
 - CAMERA MUST FOLLOW THE ACTION: if a character faces danger ahead, the camera should show the danger or the character's reaction from the front — never show the back of their head during a climactic moment. Cut to a frontal close-up for emotional beats. The camera is your audience's eyes.
 - SHOT TRANSITIONS MUST BE MOTIVATED: each cut should happen because the story demands a new perspective (reveal, reaction, escalation), not arbitrarily.
-- AUDIO IS MANDATORY: every shot must have voice narration, dialogue, or a strong sound design description. The generated video will have audio — use it.
+- DIALOGUE IS MANDATORY: at least ONE shot must contain spoken dialogue from a character (not just narration). Characters should talk — whisper, shout, cry, confess. This makes the story feel alive. Other shots can use narration or sound design, but dialogue must appear in at least one shot.
 - End with a strong cliffhanger that makes the viewer want more
 - The style should match the mood of the story
 - Always use aspect_ratio "9:16" (vertical video)
