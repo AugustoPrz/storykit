@@ -7,9 +7,32 @@
 
 .create__actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   padding: 8px 20px 0;
   min-height: 32px;
+}
+
+.create__switch {
+  display: flex;
+  gap: 4px;
+}
+
+.create__switch-btn {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--dim);
+  padding: 4px 10px;
+  transition: all 150ms linear;
+}
+
+.create__switch-btn--active {
+  color: var(--accent);
+}
+
+.create__switch-btn:hover {
+  color: var(--text);
 }
 
 .create__new {

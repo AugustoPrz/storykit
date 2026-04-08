@@ -1,20 +1,22 @@
-import { useParams, useNavigate } from 'react-router-dom';
 import { useClipsStore } from '../store/clips';
 import { downloadVideo } from '../utils/download';
 import VideoPlayer from '../components/VideoPlayer';
 import './ClipPlayer.css';
 
-export default function ClipPlayer() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+interface Props {
+  clipId: string;
+  onClose: () => void;
+}
+
+export default function ClipPlayer({ clipId, onClose }: Props) {
   const clips = useClipsStore((s) => s.clips);
   const removeClip = useClipsStore((s) => s.removeClip);
 
-  const clip = clips.find((c) => c.id === id);
+  const clip = clips.find((c) => c.id === clipId);
 
   if (!clip) {
     return (
-      <div className="player-modal" onClick={() => navigate(-1)}>
+      <div className="player-modal" onClick={onClose}>
         <div className="player-modal__content">
           <span className="player-modal__not-found">CLIP NOT FOUND</span>
         </div>
@@ -30,20 +32,16 @@ export default function ClipPlayer() {
 
   const handleDelete = () => {
     removeClip(clip.id);
-    navigate('/clips');
-  };
-
-  const handleContinue = () => {
-    navigate('/');
+    onClose();
   };
 
   const date = new Date(clip.createdAt);
 
   return (
-    <div className="player-modal" onClick={() => navigate(-1)}>
+    <div className="player-modal" onClick={onClose}>
       <div className="player-modal__content" onClick={(e) => e.stopPropagation()}>
         <div className="player-modal__header">
-          <button className="player-modal__close" onClick={() => navigate(-1)}>
+          <button className="player-modal__close" onClick={onClose}>
             &times;
           </button>
         </div>
@@ -69,9 +67,6 @@ export default function ClipPlayer() {
         <div className="player-modal__actions">
           <button className="player-modal__btn" onClick={handleDownload}>
             DOWNLOAD
-          </button>
-          <button className="player-modal__btn" onClick={handleContinue}>
-            CONTINUE STORY
           </button>
           <button className="player-modal__btn player-modal__btn--danger" onClick={handleDelete}>
             DELETE

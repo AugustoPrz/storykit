@@ -4,9 +4,15 @@ import { generateScript } from '../services/storytelling/gemini';
 import { generateVideo } from '../services/video-generation';
 import ChatMessage from '../components/ChatMessage';
 import type { ChatMessage as ChatMessageType } from '../services/video-generation/types';
+import type { AppView } from '../App';
 import './Create.css';
 
-export default function Create() {
+interface Props {
+  view: AppView;
+  onViewChange: (view: AppView) => void;
+}
+
+export default function Create({ view, onViewChange }: Props) {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -172,6 +178,20 @@ export default function Create() {
   return (
     <div className="create">
       <div className="create__actions">
+        <div className="create__switch">
+          <button
+            className={`create__switch-btn ${view === 'create' ? 'create__switch-btn--active' : ''}`}
+            onClick={() => onViewChange('create')}
+          >
+            CREATE
+          </button>
+          <button
+            className={`create__switch-btn ${view === 'clips' ? 'create__switch-btn--active' : ''}`}
+            onClick={() => onViewChange('clips')}
+          >
+            CLIPS
+          </button>
+        </div>
         {chatMessages.length > 0 && (
           <button className="create__new" onClick={handleNew}>NEW</button>
         )}
