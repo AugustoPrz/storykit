@@ -61,9 +61,15 @@
 
 .create__input {
   flex: 1;
+  min-width: 0;
   padding: 10px 0;
   font-size: 14px;
   color: var(--text);
+  border-bottom: 0.5px solid var(--border);
+}
+
+.create__input:focus {
+  border-bottom-color: var(--accent);
 }
 
 .create__input::placeholder {
@@ -75,6 +81,7 @@
 }
 
 .create__send {
+  flex-shrink: 0;
   font-family: var(--mono);
   font-size: 12px;
   font-weight: 700;
