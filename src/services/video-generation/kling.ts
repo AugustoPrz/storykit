@@ -56,6 +56,7 @@ function buildO3Payload(script: Script, referenceVideoUrl: string) {
     model: 'kling-o3-reference-to-video',
     prompt,
     video_url: referenceVideoUrl,
+    keep_original_sound: false,
     duration: Math.max(3, Math.min(10, script.duration_seconds)),
     aspect_ratio: script.aspect_ratio || '9:16',
     quality: '720p',
