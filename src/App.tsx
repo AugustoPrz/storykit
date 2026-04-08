@@ -29,7 +29,7 @@ export default function App() {
 
       <main className="app-content">
         {view === 'create' ? (
-          <Create view={view} onViewChange={setView} />
+          <Create onViewChange={setView} />
         ) : (
           <Clips onPlay={setPlayerId} onViewChange={setView} />
         )}

@@ -1,7 +1,27 @@
 .clips {
   height: 100%;
   overflow-y: auto;
-  padding: 16px 20px;
+  padding: 0 20px 16px;
+}
+
+.clips__actions {
+  display: flex;
+  justify-content: flex-start;
+  padding: 8px 0;
+}
+
+.clips__switch-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--dim);
+  transition: color 150ms linear;
+}
+
+.clips__switch-btn:hover {
+  color: var(--text);
 }
 
 .clips--empty {

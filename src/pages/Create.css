@@ -13,22 +13,14 @@
   min-height: 32px;
 }
 
-.create__switch {
-  display: flex;
-  gap: 4px;
-}
-
 .create__switch-btn {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
   color: var(--dim);
-  padding: 4px 10px;
-  transition: all 150ms linear;
-}
-
-.create__switch-btn--active {
-  color: var(--accent);
+  transition: color 150ms linear;
 }
 
 .create__switch-btn:hover {

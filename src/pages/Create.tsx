@@ -8,11 +8,10 @@ import type { AppView } from '../App';
 import './Create.css';
 
 interface Props {
-  view: AppView;
   onViewChange: (view: AppView) => void;
 }
 
-export default function Create({ view, onViewChange }: Props) {
+export default function Create({ onViewChange }: Props) {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -178,20 +177,14 @@ export default function Create({ view, onViewChange }: Props) {
   return (
     <div className="create">
       <div className="create__actions">
-        <div className="create__switch">
-          <button
-            className={`create__switch-btn ${view === 'create' ? 'create__switch-btn--active' : ''}`}
-            onClick={() => onViewChange('create')}
-          >
-            CREATE
-          </button>
-          <button
-            className={`create__switch-btn ${view === 'clips' ? 'create__switch-btn--active' : ''}`}
-            onClick={() => onViewChange('clips')}
-          >
-            CLIPS
-          </button>
-        </div>
+        <button className="create__switch-btn" onClick={() => onViewChange('clips')}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+          </svg>
+        </button>
         {chatMessages.length > 0 && (
           <button className="create__new" onClick={handleNew}>NEW</button>
         )}
