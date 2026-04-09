@@ -1,3 +1,4 @@
+import { useRef, useCallback } from 'react';
 import type { Script } from '../services/video-generation/types';
 import GenerationProgress from './GenerationProgress';
 import VideoPlayer from './VideoPlayer';
@@ -8,6 +9,7 @@ interface Props {
   onGenerate?: () => void;
   onContinue?: () => void;
   onEnd?: () => void;
+  onScriptUpdate?: (script: Script) => void;
   isGenerating?: boolean;
   generationProgress?: number;
   generationMessage?: string;
@@ -15,17 +17,55 @@ interface Props {
   videoUrl?: string;
 }
 
+function AutoTextarea({ value, onChange, className }: {
+  value: string;
+  onChange: (val: string) => void;
+  className: string;
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onChange(e.target.value);
+    e.target.style.height = 'auto';
+    e.target.style.height = e.target.scrollHeight + 'px';
+  }, [onChange]);
+
+  return (
+    <textarea
+      ref={ref}
+      className={className}
+      value={value}
+      onChange={handleChange}
+      rows={1}
+      onFocus={(e) => {
+        e.target.style.height = 'auto';
+        e.target.style.height = e.target.scrollHeight + 'px';
+      }}
+    />
+  );
+}
+
 export default function ScriptCard({
   script,
   onGenerate,
   onContinue,
   onEnd,
+  onScriptUpdate,
   isGenerating,
   generationProgress = 0,
   generationMessage = '',
   generationError,
   videoUrl,
 }: Props) {
+  const isEditable = !videoUrl && !isGenerating && !!onScriptUpdate;
+
+  const updateShot = (index: number, field: 'visual' | 'dialogue', value: string) => {
+    if (!onScriptUpdate) return;
+    const newShots = script.shots.map((shot, i) =>
+      i === index ? { ...shot, [field]: value || null } : shot
+    );
+    onScriptUpdate({ ...script, shots: newShots });
+  };
+
   return (
     <div className="script-card">
       <div className="script-card__header">
@@ -58,13 +98,29 @@ export default function ScriptCard({
 
       <div className="script-card__shots">
         <span className="script-card__label">SHOTS ({script.shots.length})</span>
-        {script.shots.map((shot) => (
+        {script.shots.map((shot, i) => (
           <div key={shot.shot_number} className="script-card__shot">
             <span className="script-card__shot-num">#{shot.shot_number}</span>
-            <span className="script-card__shot-detail">{shot.visual}</span>
+            {isEditable ? (
+              <AutoTextarea
+                className="script-card__shot-edit"
+                value={shot.visual}
+                onChange={(val) => updateShot(i, 'visual', val)}
+              />
+            ) : (
+              <span className="script-card__shot-detail">{shot.visual}</span>
+            )}
             <span className="script-card__shot-camera">{shot.camera}</span>
-            {shot.dialogue && (
-              <span className="script-card__shot-dialogue">{shot.dialogue}</span>
+            {isEditable ? (
+              <AutoTextarea
+                className="script-card__shot-edit script-card__shot-edit--dialogue"
+                value={shot.dialogue || ''}
+                onChange={(val) => updateShot(i, 'dialogue', val)}
+              />
+            ) : (
+              shot.dialogue && (
+                <span className="script-card__shot-dialogue">{shot.dialogue}</span>
+              )
             )}
           </div>
         ))}

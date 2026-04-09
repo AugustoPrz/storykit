@@ -161,6 +161,14 @@ export default function Create({ onViewChange }: Props) {
     handleSend('END — Wrap up the story with a dramatic finale');
   };
 
+  const handleScriptUpdate = (msgId: string, updatedScript: import('../services/video-generation/types').Script) => {
+    updateMessage(msgId, { script: updatedScript });
+    // Also update the clip's script
+    if (currentClipId) {
+      updateClip(currentClipId, { script: updatedScript });
+    }
+  };
+
   const handleNew = () => {
     clearChat();
     setInput('');
@@ -209,6 +217,7 @@ export default function Create({ onViewChange }: Props) {
               onGenerate={showGenerate ? handleGenerate : undefined}
               onContinue={msgClip?.videoUrl && !isSeriesComplete ? handleContinue : undefined}
               onEnd={msgClip?.videoUrl && !isSeriesComplete ? handleEnd : undefined}
+              onScriptUpdate={showGenerate ? (s) => handleScriptUpdate(msg.id, s) : undefined}
               isGenerating={showGenerating || false}
               generationProgress={generationStatus.progress}
               generationMessage={generationStatus.message}

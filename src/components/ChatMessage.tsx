@@ -7,6 +7,7 @@ interface Props {
   onGenerate?: () => void;
   onContinue?: () => void;
   onEnd?: () => void;
+  onScriptUpdate?: (script: import('../services/video-generation/types').Script) => void;
   isGenerating?: boolean;
   generationProgress?: number;
   generationMessage?: string;
@@ -19,6 +20,7 @@ export default function ChatMessage({
   onGenerate,
   onContinue,
   onEnd,
+  onScriptUpdate,
   isGenerating,
   generationProgress,
   generationMessage,
@@ -61,6 +63,7 @@ export default function ChatMessage({
           videoUrl={videoUrl}
           onContinue={onContinue}
           onEnd={onEnd}
+          onScriptUpdate={onScriptUpdate}
         />
       )}
     </div>

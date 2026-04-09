@@ -94,6 +94,31 @@
   letter-spacing: 1px;
 }
 
+.script-card__shot-edit {
+  display: block;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text);
+  line-height: 1.4;
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid var(--border);
+  padding: 6px 8px;
+  margin-bottom: 2px;
+  resize: none;
+  overflow: hidden;
+}
+
+.script-card__shot-edit:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.script-card__shot-edit--dialogue {
+  color: var(--accent);
+  font-style: italic;
+}
+
 .script-card__shot-dialogue {
   display: block;
   font-family: var(--mono);
