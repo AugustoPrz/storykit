@@ -68,6 +68,32 @@
   letter-spacing: 1px;
 }
 
+.script-card__characters {
+  margin-bottom: 12px;
+}
+
+.script-card__character {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  padding: 4px 0;
+  border-top: 0.5px solid var(--border);
+}
+
+.script-card__char-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text);
+}
+
+.script-card__char-role {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
 .script-card__shot-dialogue {
   display: block;
   font-family: var(--mono);

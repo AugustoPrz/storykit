@@ -44,6 +44,18 @@ export default function ScriptCard({
         </div>
       </div>
 
+      {script.characters?.length > 0 && (
+        <div className="script-card__characters">
+          <span className="script-card__label">CAST ({script.characters.length})</span>
+          {script.characters.map((c) => (
+            <div key={c.name} className="script-card__character">
+              <span className="script-card__char-name">{c.name}</span>
+              <span className="script-card__char-role">{c.role}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="script-card__shots">
         <span className="script-card__label">SHOTS ({script.shots.length})</span>
         {script.shots.map((shot) => (

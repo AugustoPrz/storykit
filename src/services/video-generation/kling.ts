@@ -31,10 +31,21 @@ function buildMultiPrompt(script: Script) {
   }));
 }
 
+function buildCharacterSummary(script: Script): string {
+  if (!script.characters?.length) return '';
+  return script.characters
+    .map((c) => `${c.name} (${c.role}): ${c.appearance}`)
+    .join('. ');
+}
+
 function buildV3Payload(script: Script) {
+  const charSummary = buildCharacterSummary(script);
+  const prompt = charSummary
+    ? `${script.title}. Characters: ${charSummary}`.slice(0, 2500)
+    : script.title;
   return {
     model: 'kling-v3-text-to-video',
-    prompt: script.title,
+    prompt,
     duration: Math.max(3, Math.min(10, script.duration_seconds)),
     aspect_ratio: script.aspect_ratio || '9:16',
     quality: '720p',
@@ -48,12 +59,15 @@ function buildV3Payload(script: Script) {
 }
 
 function buildO3Payload(script: Script, referenceVideoUrl: string) {
+  const charSummary = buildCharacterSummary(script);
   const shotPrompts = script.shots
     .slice(0, MAX_SHOTS)
     .map((s) => buildShotPrompt(s))
     .join(' | ');
-  const prompt =
-    shotPrompts.length > 2500 ? shotPrompts.slice(0, 2497) + '...' : shotPrompts;
+  const raw = charSummary
+    ? `Characters: ${charSummary}. Shots: ${shotPrompts}`
+    : shotPrompts;
+  const prompt = raw.length > 2500 ? raw.slice(0, 2497) + '...' : raw;
 
   return {
     model: 'kling-o3-reference-to-video',

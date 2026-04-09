@@ -8,11 +8,18 @@ The JSON must match this exact schema:
 {
   "title": "string — short evocative title",
   "duration_seconds": number between 5 and 10,
+  "characters": [
+    {
+      "name": "string — character name",
+      "role": "string — protagonist, antagonist, supporting, etc.",
+      "appearance": "string — VERY detailed physical description: gender, age range, ethnicity, hair color/style/length, eye color, face shape, build, exact clothing with colors and details, distinguishing features (scars, tattoos, glasses, beard, etc). Be SPECIFIC enough that an AI video generator produces the same person every time. Example: 'Woman, early 30s, East Asian, long straight black hair past shoulders, dark brown eyes, oval face, slim build, wearing a fitted navy blue blazer over white silk blouse, small gold stud earrings'"
+    }
+  ],
   "shots": [
     {
       "shot_number": 1,
       "duration": "string — e.g. '0-5s'",
-      "visual": "string — detailed visual description for video gen model, include lighting, mood, action",
+      "visual": "string — detailed visual description. IMPORTANT: when a character appears, reference them by name AND repeat their key appearance details (hair, clothing, build) so the video AI generates them consistently",
       "audio": "string — sound effects, ambient sounds, music mood",
       "camera": "string — e.g. 'slow dolly in', 'static wide', 'tracking shot'",
       "dialogue": "string or null — exact spoken words by a character in this shot, e.g. '\"No... that can't be right.\"' or null if no dialogue in this shot"
@@ -73,7 +80,7 @@ EPISODE STRUCTURE: ${episodeRole}
 
 CONTINUATION RULES — these are mandatory:
 1. TITLE: Use "${baseTitle} — Part ${ep}" as the title. Do NOT stack part numbers.
-2. CHARACTERS: The SAME characters must appear. Describe them with the EXACT same physical appearance (clothing, hair, face, body type) as the previous episode.
+2. CHARACTERS: Copy the "characters" array from the previous episode EXACTLY — same names, same roles, same appearance strings word-for-word. Do NOT change any character's appearance. If adding a new character, append them to the array. In every shot's "visual" field, when a character appears, always mention their name and repeat their key visual traits (hair, clothing, build) so the AI video generator renders them identically.
 3. SETTING: Continue in the same location or a directly connected space. Describe the environment consistently.
 4. STYLE: Use the exact same visual style "${previousScript.style}".
 5. PLOT: Pick up DIRECTLY from the cliffhanger: "${previousScript.cliffhanger}". The first shot must be the immediate next moment — do not skip time or reset the scene.

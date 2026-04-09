@@ -7,9 +7,16 @@ export interface ScriptShot {
   dialogue?: string;
 }
 
+export interface ScriptCharacter {
+  name: string;
+  role: string;
+  appearance: string;
+}
+
 export interface Script {
   title: string;
   duration_seconds: number;
+  characters: ScriptCharacter[];
   shots: ScriptShot[];
   cliffhanger: string;
   hook_for_next: string;
