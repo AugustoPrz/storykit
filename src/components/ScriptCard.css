@@ -113,9 +113,14 @@
   margin-top: 12px;
 }
 
-.script-card__continue {
-  width: 100%;
+.script-card__story-actions {
+  display: flex;
+  gap: 8px;
   margin-top: 8px;
+}
+
+.script-card__continue {
+  flex: 1;
   padding: 10px;
   border: 0.5px solid var(--border);
   color: var(--text);
@@ -127,4 +132,20 @@
 
 .script-card__continue:hover {
   border-color: var(--text);
+}
+
+.script-card__end {
+  flex: 1;
+  padding: 10px;
+  border: 0.5px solid var(--border);
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  transition: all 150ms linear;
+}
+
+.script-card__end:hover {
+  color: var(--accent);
+  border-color: var(--accent);
 }

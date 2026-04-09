@@ -6,6 +6,7 @@ interface Props {
   message: ChatMessageType;
   onGenerate?: () => void;
   onContinue?: () => void;
+  onEnd?: () => void;
   isGenerating?: boolean;
   generationProgress?: number;
   generationMessage?: string;
@@ -17,6 +18,7 @@ export default function ChatMessage({
   message,
   onGenerate,
   onContinue,
+  onEnd,
   isGenerating,
   generationProgress,
   generationMessage,
@@ -58,6 +60,7 @@ export default function ChatMessage({
           generationError={generationError}
           videoUrl={videoUrl}
           onContinue={onContinue}
+          onEnd={onEnd}
         />
       )}
     </div>

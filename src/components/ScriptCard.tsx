@@ -7,6 +7,7 @@ interface Props {
   script: Script;
   onGenerate?: () => void;
   onContinue?: () => void;
+  onEnd?: () => void;
   isGenerating?: boolean;
   generationProgress?: number;
   generationMessage?: string;
@@ -18,6 +19,7 @@ export default function ScriptCard({
   script,
   onGenerate,
   onContinue,
+  onEnd,
   isGenerating,
   generationProgress = 0,
   generationMessage = '',
@@ -56,18 +58,34 @@ export default function ScriptCard({
         ))}
       </div>
 
-      <div className="script-card__footer">
-        <span className="script-card__label">CLIFFHANGER</span>
-        <span className="script-card__value">{script.cliffhanger}</span>
-      </div>
+      {script.cliffhanger && script.cliffhanger !== 'END' && (
+        <div className="script-card__footer">
+          <span className="script-card__label">CLIFFHANGER</span>
+          <span className="script-card__value">{script.cliffhanger}</span>
+        </div>
+      )}
+      {script.cliffhanger === 'END' && (
+        <div className="script-card__footer">
+          <span className="script-card__label">FINALE</span>
+        </div>
+      )}
 
       {videoUrl ? (
         <div className="script-card__video">
           <VideoPlayer url={videoUrl} />
-          {onContinue && (
-            <button className="script-card__continue" onClick={onContinue}>
-              CONTINUE THIS STORY
-            </button>
+          {(onContinue || onEnd) && (
+            <div className="script-card__story-actions">
+              {onContinue && (
+                <button className="script-card__continue" onClick={onContinue}>
+                  CONTINUE
+                </button>
+              )}
+              {onEnd && (
+                <button className="script-card__end" onClick={onEnd}>
+                  END STORY
+                </button>
+              )}
+            </div>
           )}
         </div>
       ) : isGenerating ? (

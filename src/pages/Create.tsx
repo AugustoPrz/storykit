@@ -33,14 +33,8 @@ export default function Create({ onViewChange }: Props) {
 
   const currentClip = clips.find((c) => c.id === currentClipId);
   const isWorking = generationStatus.phase === 'scripting' || generationStatus.phase === 'generating';
-  const MAX_EPISODES = 3;
-  // Count videos generated in this chat session
-  const sessionVideoCount = chatMessages.filter((m) => {
-    if (!m.script) return false;
-    const clip = m.clipId ? clips.find((c) => c.id === m.clipId) : currentClip;
-    return clip?.videoUrl;
-  }).length + (currentClip?.videoUrl && !chatMessages.some((m) => m.clipId === currentClipId) ? 1 : 0);
-  const isSeriesComplete = sessionVideoCount >= MAX_EPISODES;
+  // Series is complete when the last generated clip's cliffhanger is "END"
+  const isSeriesComplete = currentClip?.script?.cliffhanger === 'END' && !!currentClip?.videoUrl;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -89,10 +83,12 @@ export default function Create({ onViewChange }: Props) {
       // Count session clips with videos for episode numbering
       const videoClipCount = clips.filter((c) => sessionClipIds.has(c.id) && c.videoUrl).length;
       const episodeNumber = videoClipCount + 1;
+      const isFinalEpisode = text.toUpperCase().includes('END');
       const script = await generateScript(
         text,
         lastVideoClip ? previousScript : undefined,
-        lastVideoClip ? episodeNumber : undefined
+        lastVideoClip ? episodeNumber : undefined,
+        lastVideoClip ? isFinalEpisode : undefined
       );
 
       updateMessage(assistantMsgId, {
@@ -161,6 +157,10 @@ export default function Create({ onViewChange }: Props) {
     handleSend('Continue the story');
   };
 
+  const handleEnd = () => {
+    handleSend('END — Wrap up the story with a dramatic finale');
+  };
+
   const handleNew = () => {
     clearChat();
     setInput('');
@@ -208,6 +208,7 @@ export default function Create({ onViewChange }: Props) {
               message={msg}
               onGenerate={showGenerate ? handleGenerate : undefined}
               onContinue={msgClip?.videoUrl && !isSeriesComplete ? handleContinue : undefined}
+              onEnd={msgClip?.videoUrl && !isSeriesComplete ? handleEnd : undefined}
               isGenerating={showGenerating || false}
               generationProgress={generationStatus.progress}
               generationMessage={generationStatus.message}

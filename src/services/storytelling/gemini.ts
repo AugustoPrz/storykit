@@ -15,14 +15,15 @@ function stripMarkdownFences(text: string): string {
 export async function generateScript(
   userMessage: string,
   previousScript?: Script,
-  episodeNumber?: number
+  episodeNumber?: number,
+  isFinalEpisode?: boolean
 ): Promise<Script> {
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
   if (!apiKey || apiKey === 'your_gemini_key_here') {
     throw new Error('Missing Gemini API key. Add VITE_GEMINI_API_KEY to your .env file.');
   }
 
-  const prompt = buildPrompt(userMessage, previousScript, episodeNumber);
+  const prompt = buildPrompt(userMessage, previousScript, episodeNumber, isFinalEpisode);
   const body = JSON.stringify({
     contents: [{ parts: [{ text: prompt }] }],
     generationConfig: {

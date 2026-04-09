@@ -39,35 +39,40 @@ DIRECTING RULES — follow these strictly:
 - Always use aspect_ratio "9:16" (vertical video)
 - Each shot's visual description should be self-contained and detailed enough for an AI video generator to produce it without additional context`;
 
+function getBaseTitle(title: string): string {
+  return title.replace(/\s*—\s*Part\s*\d+$/i, '').trim();
+}
+
 export function buildPrompt(
   userMessage: string,
   previousScript?: Script,
-  episodeNumber?: number
+  episodeNumber?: number,
+  isFinalEpisode?: boolean
 ): string {
   if (previousScript) {
     const ep = episodeNumber ?? 2;
-    const isFinalEpisode = ep >= 3;
+    const baseTitle = getBaseTitle(previousScript.title);
 
     const episodeRole = isFinalEpisode
-      ? `This is the FINAL EPISODE (Episode 3 of 3). You MUST:
+      ? `This is the FINAL EPISODE. You MUST:
 - Resolve the central dramatic conflict — give the audience a satisfying or shocking conclusion
 - Do NOT end with a cliffhanger. Set "cliffhanger" to "END" and "hook_for_next" to "END"
 - Deliver the emotional payoff: confession, confrontation, revelation, or consequence
 - Make the last shot feel like a dramatic finale — a door closing, a face in tears, walking away, silence after the storm`
-      : `This is Episode ${ep} of 3 (middle chapter). You MUST:
-- Escalate the tension significantly from Episode ${ep - 1}
+      : `This is Episode ${ep} (continuation). You MUST:
+- Escalate the tension significantly from the previous episode
 - Introduce a twist, betrayal, or revelation that changes everything
 - End with an even STRONGER cliffhanger than the previous episode`;
 
     return `${SYSTEM_PROMPT}
 
-CONTEXT — Previous episode script (Episode ${ep - 1} of 3):
+CONTEXT — Previous episode script (Episode ${ep - 1}):
 ${JSON.stringify(previousScript, null, 2)}
 
 EPISODE STRUCTURE: ${episodeRole}
 
 CONTINUATION RULES — these are mandatory:
-1. TITLE: Use the SAME base title "${previousScript.title}" and append " — Part ${ep}"
+1. TITLE: Use "${baseTitle} — Part ${ep}" as the title. Do NOT stack part numbers.
 2. CHARACTERS: The SAME characters must appear. Describe them with the EXACT same physical appearance (clothing, hair, face, body type) as the previous episode.
 3. SETTING: Continue in the same location or a directly connected space. Describe the environment consistently.
 4. STYLE: Use the exact same visual style "${previousScript.style}".
@@ -78,7 +83,7 @@ User request: ${userMessage}`;
 
   return `${SYSTEM_PROMPT}
 
-This is Episode 1 of a 3-part drama series. Set up compelling characters, a dramatic situation, and end with a strong cliffhanger that demands a continuation.
+This is Episode 1 of a drama series. Set up compelling characters, a dramatic situation, and end with a strong cliffhanger that demands a continuation.
 
 Create a script for this story idea: ${userMessage}`;
 }
