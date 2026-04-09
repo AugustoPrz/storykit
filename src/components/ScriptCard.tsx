@@ -68,6 +68,19 @@ export default function ScriptCard({
     onScriptUpdate({ ...script, shots: newShots });
   };
 
+  const removeShot = (index: number) => {
+    if (!onScriptUpdate || script.shots.length <= 1) return;
+    const newShots = script.shots
+      .filter((_, i) => i !== index)
+      .map((shot, i) => ({ ...shot, shot_number: i + 1 }));
+    onScriptUpdate({ ...script, shots: newShots });
+  };
+
+  const updateCliffhanger = (value: string) => {
+    if (!onScriptUpdate) return;
+    onScriptUpdate({ ...script, cliffhanger: value });
+  };
+
   return (
     <div className="script-card">
       <div className="script-card__header">
@@ -102,7 +115,12 @@ export default function ScriptCard({
         <span className="script-card__label">SHOTS ({script.shots.length})</span>
         {script.shots.map((shot, i) => (
           <div key={shot.shot_number} className="script-card__shot">
-            <span className="script-card__shot-num">#{shot.shot_number}</span>
+            <div className="script-card__shot-header">
+              <span className="script-card__shot-num">#{shot.shot_number}</span>
+              {isEditable && script.shots.length > 1 && (
+                <button className="script-card__shot-remove" onClick={() => removeShot(i)}>✕</button>
+              )}
+            </div>
             {isEditable ? (
               <AutoTextarea
                 className="script-card__shot-edit"
@@ -131,7 +149,15 @@ export default function ScriptCard({
       {script.cliffhanger && script.cliffhanger !== 'END' && (
         <div className="script-card__footer">
           <span className="script-card__label">CLIFFHANGER</span>
-          <span className="script-card__value">{script.cliffhanger}</span>
+          {isEditable ? (
+            <AutoTextarea
+              className="script-card__shot-edit"
+              value={script.cliffhanger}
+              onChange={updateCliffhanger}
+            />
+          ) : (
+            <span className="script-card__value">{script.cliffhanger}</span>
+          )}
         </div>
       )}
       {script.cliffhanger === 'END' && (

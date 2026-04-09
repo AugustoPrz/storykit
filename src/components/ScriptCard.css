@@ -42,13 +42,30 @@
   padding: 8px 0;
 }
 
+.script-card__shot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
 .script-card__shot-num {
   font-family: var(--mono);
   font-size: 9px;
   color: var(--accent);
   letter-spacing: 1px;
-  display: block;
-  margin-bottom: 2px;
+}
+
+.script-card__shot-remove {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim);
+  padding: 2px 6px;
+  transition: color 150ms linear;
+}
+
+.script-card__shot-remove:hover {
+  color: var(--accent);
 }
 
 .script-card__shot-detail {
