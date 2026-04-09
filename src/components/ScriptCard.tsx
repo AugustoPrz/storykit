@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import type { Script } from '../services/video-generation/types';
 import GenerationProgress from './GenerationProgress';
 import VideoPlayer from './VideoPlayer';
@@ -23,10 +23,16 @@ function AutoTextarea({ value, onChange, className }: {
   className: string;
 }) {
   const ref = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.style.height = 'auto';
+      ref.current.style.height = ref.current.scrollHeight + 'px';
+    }
+  }, [value]);
+
   const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value);
-    e.target.style.height = 'auto';
-    e.target.style.height = e.target.scrollHeight + 'px';
   }, [onChange]);
 
   return (
@@ -36,10 +42,6 @@ function AutoTextarea({ value, onChange, className }: {
       value={value}
       onChange={handleChange}
       rows={1}
-      onFocus={(e) => {
-        e.target.style.height = 'auto';
-        e.target.style.height = e.target.scrollHeight + 'px';
-      }}
     />
   );
 }
