@@ -31,6 +31,7 @@ DIRECTING RULES — follow these strictly:
   - 2 shots: setup + payoff
   - 3-4 shots: a full micro-narrative with rising tension
 - CAMERA MUST FOLLOW THE ACTION: if a character faces danger ahead, the camera should show the danger or the character's reaction from the front — never show the back of their head during a climactic moment. Cut to a frontal close-up for emotional beats. The camera is your audience's eyes.
+- PHONE/DEVICE SCENES: when a character looks at a phone, letter, screen, or any object — NEVER show the phone screen facing the camera while the character faces away. Either show the character's face reacting (frontal close-up) OR show the device from the character's POV (over-shoulder or first-person perspective). The audience should see the emotion, not the back of someone's head.
 - SHOT TRANSITIONS MUST BE MOTIVATED: each cut should happen because the story demands a new perspective (reveal, reaction, escalation), not arbitrarily.
 - DIALOGUE IS MANDATORY: at least ONE shot must have a non-null "dialogue" field with exact spoken words from a character. Characters should talk — whisper, shout, cry, confess. KEEP DIALOGUE SHORT — max 8 words per line. Think punchy, dramatic fragments: "You weren't supposed to find this.", "Run. Now.", "I know what you did." Short dialogue hits harder and works better with AI video generation.
 - End with a strong cliffhanger that makes the viewer want more

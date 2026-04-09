@@ -7,7 +7,10 @@ const MAX_SHOT_PROMPT_CHARS = 512;
 const MAX_SHOTS = 6;
 
 function buildShotPrompt(shot: ScriptShot): string {
-  const raw = `[${shot.camera}] ${shot.visual}`;
+  let raw = `[${shot.camera}] ${shot.visual}`;
+  if (shot.dialogue) {
+    raw += ` The character says: "${shot.dialogue}"`;
+  }
   if (raw.length <= MAX_SHOT_PROMPT_CHARS) return raw;
   return raw.slice(0, MAX_SHOT_PROMPT_CHARS - 3).replace(/\s+\S*$/, '') + '...';
 }
