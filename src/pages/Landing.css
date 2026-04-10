@@ -85,7 +85,9 @@
     width: 400px;
     align-items: flex-start;
     text-align: left;
-    background: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.85) 20%, rgba(0, 0, 0, 0.95) 100%);
+    background: #000;
+    border-left: 0.5px solid var(--border);
+    border-radius: 0;
     padding: 60px 40px;
     justify-content: center;
   }
