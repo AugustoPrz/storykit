@@ -1,7 +1,6 @@
 import type { Script, ScriptShot, VideoGenerationResponse } from './types';
 
-// Use proxy to avoid CORS issues — Vite dev proxy and Vercel serverless function
-const EVOLINK_BASE = '/api/evolink';
+const EVOLINK_BASE = 'https://api.evolink.ai/v1';
 const POLL_INTERVAL_MS = 10_000;
 const MAX_POLL_ATTEMPTS = 60;
 const MAX_SHOT_PROMPT_CHARS = 512;

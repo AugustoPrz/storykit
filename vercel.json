@@ -1,6 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/api/evolink/(.*)", "destination": "/api/evolink/$1" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ]
-}
