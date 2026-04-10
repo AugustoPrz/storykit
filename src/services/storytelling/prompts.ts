@@ -6,6 +6,8 @@ const NAME_POOLS = [
   ['Nadia', 'Haruto', 'Zara', 'Emeka', 'Lena', 'Mateo', 'Aisha', 'Soren'],
   ['Ren', 'Dalia', 'Kofi', 'Maren', 'Idris', 'Yara', 'Tobias', 'Jin'],
   ['Esme', 'Kian', 'Solange', 'Nikolai', 'Mei', 'Dante', 'Ingrid', 'Tariq'],
+  ['Bryce', 'Cassandra', 'Wyatt', 'Jocelyn', 'Trent', 'Morgan', 'Devin', 'Shelby'],
+  ['Carter', 'Naomi', 'Wesley', 'Autumn', 'Malik', 'Brooklyn', 'Travis', 'Kendra'],
 ];
 
 function getNameHint(): string {
