@@ -34,10 +34,19 @@
   overflow: hidden;
   aspect-ratio: 9 / 14;
   border-radius: 4px;
+  background: var(--surface);
 }
 
 .landing__card--tall {
   aspect-ratio: 9 / 18;
+}
+
+.landing__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .landing__card-inner {
