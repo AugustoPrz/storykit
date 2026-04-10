@@ -1,5 +1,19 @@
 import type { Script } from '../video-generation/types';
 
+const NAME_POOLS = [
+  ['Yuki', 'Kenji', 'Amara', 'Dmitri', 'Priya', 'Tomás', 'Ines', 'Ravi'],
+  ['Seo-yeon', 'Kwame', 'Leila', 'Viktor', 'Chiara', 'Arlo', 'Fatima', 'Oleg'],
+  ['Nadia', 'Haruto', 'Zara', 'Emeka', 'Lena', 'Mateo', 'Aisha', 'Soren'],
+  ['Ren', 'Dalia', 'Kofi', 'Maren', 'Idris', 'Yara', 'Tobias', 'Jin'],
+  ['Esme', 'Kian', 'Solange', 'Nikolai', 'Mei', 'Dante', 'Ingrid', 'Tariq'],
+];
+
+function getNameHint(): string {
+  const pool = NAME_POOLS[Math.floor(Math.random() * NAME_POOLS.length)];
+  const picked = pool.sort(() => Math.random() - 0.5).slice(0, 3);
+  return `Use diverse, global names. For this story, consider names like: ${picked.join(', ')}. Avoid overused names like Julian, Maya, Elena, Marcus, Leo, Sophie.`;
+}
+
 const SYSTEM_PROMPT = `You are a cinematic DRAMA writer and director. Every story you create must be rooted in DRAMA — emotional conflict, betrayal, secrets, tension between characters, moral dilemmas, power struggles, or heartbreak. Even if the setting is sci-fi, fantasy, or thriller, the core must always be a dramatic human story with high emotional stakes. Think DramaBox, telenovela intensity, K-drama cliffhangers.
 
 You create structured scripts for short AI-generated video clips. You MUST respond with ONLY a valid JSON object — no markdown, no preamble, no explanation.
@@ -89,6 +103,8 @@ User request: ${userMessage}`;
   }
 
   return `${SYSTEM_PROMPT}
+
+${getNameHint()}
 
 This is Episode 1 of a drama series. Set up compelling characters, a dramatic situation, and end with a strong cliffhanger that demands a continuation.
 
