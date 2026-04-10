@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useClipsStore } from './store/clips';
+import Landing from './pages/Landing';
 import Create from './pages/Create';
 import Clips from './pages/Clips';
 import ClipPlayer from './pages/ClipPlayer';
@@ -7,10 +8,10 @@ import './App.css';
 
 const USD_PER_CREDIT = 10 / 680;
 
-export type AppView = 'create' | 'clips';
+export type AppView = 'landing' | 'create' | 'clips';
 
 export default function App() {
-  const [view, setView] = useState<AppView>('create');
+  const [view, setView] = useState<AppView>('landing');
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [continueFromClipId, setContinueFromClipId] = useState<string | null>(null);
   const creditsUsed = useClipsStore((s) => s.creditsUsed);
@@ -20,6 +21,10 @@ export default function App() {
     setContinueFromClipId(clipId);
     setView('create');
   };
+
+  if (view === 'landing') {
+    return <Landing onSkip={() => setView('create')} />;
+  }
 
   return (
     <div className="app">
