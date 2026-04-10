@@ -15,12 +15,14 @@ export interface ScriptCharacter {
 
 export interface Script {
   title: string;
+  genre?: string;
   duration_seconds: number;
   characters: ScriptCharacter[];
   shots: ScriptShot[];
   cliffhanger: string;
   hook_for_next: string;
   style: string;
+  mood?: string;
   aspect_ratio: string;
 }
 

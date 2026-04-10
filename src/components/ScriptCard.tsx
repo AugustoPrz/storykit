@@ -95,6 +95,18 @@ export default function ScriptCard({
       </div>
 
       <div className="script-card__row">
+        {script.genre && (
+          <div>
+            <span className="script-card__label">GENRE</span>
+            <span className="script-card__value">{script.genre}</span>
+          </div>
+        )}
+        {script.mood && (
+          <div>
+            <span className="script-card__label">MOOD</span>
+            <span className="script-card__value">{script.mood}</span>
+          </div>
+        )}
         <div>
           <span className="script-card__label">STYLE</span>
           <span className="script-card__value">{script.style}</span>

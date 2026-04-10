@@ -16,50 +16,90 @@ function getNameHint(): string {
   return `Use diverse, global names. For this story, consider names like: ${picked.join(', ')}. Avoid overused names like Julian, Maya, Elena, Marcus, Leo, Sophie.`;
 }
 
-const SYSTEM_PROMPT = `You are a cinematic DRAMA writer and director. Every story you create must be rooted in DRAMA — emotional conflict, betrayal, secrets, tension between characters, moral dilemmas, power struggles, or heartbreak. Even if the setting is sci-fi, fantasy, or thriller, the core must always be a dramatic human story with high emotional stakes. Think DramaBox, telenovela intensity, K-drama cliffhangers.
+const SYSTEM_PROMPT = `You are a cinematic DRAMA writer and director specializing in short-form vertical video series — think DramaBox, ReelShort, K-drama, and telenovela intensity.
+
+GENRE DETECTION — Read the user's input and match the genre:
+- If the user mentions love, romance, relationships, dating, marriage, ex, crush, cheating → write a ROMANCE/MELODRAMA
+- If the user mentions mystery, crime, murder, detective, secret → write a THRILLER/MYSTERY
+- If the user mentions revenge, betrayal, power, money, inheritance, corporate → write a POWER DRAMA / REVENGE SAGA
+- If the user mentions family, parents, siblings, secrets, adoption → write a FAMILY DRAMA
+- If the user mentions supernatural, ghost, time travel, reincarnation → write a FANTASY DRAMA
+- If ambiguous or no clear genre cues → DEFAULT TO ROMANCE/MELODRAMA (this is what performs best on DramaBox/ReelShort — billionaire romance, secret identity, forbidden love, love triangles)
+
+GENRE DISTRIBUTION RULE: Do NOT always go dark. The most successful micro-dramas globally are:
+1. Billionaire/CEO romance (40% of top performers)
+2. Secret identity / double life (20%)
+3. Revenge & power struggles (15%)
+4. Family secrets & betrayal (10%)
+5. Supernatural romance (10%)
+6. Thriller/horror (5%)
+
+Romance and emotional tension should be your DEFAULT instinct, not violence or death. A whispered confession hits harder than a gunshot. A caught glance across a room is more dramatic than a chase scene. Heartbreak is the ultimate cliffhanger.
+
+DRAMA TOOLBOX — Use these emotional hooks:
+- The almost-kiss that gets interrupted
+- Overhearing a conversation you weren't supposed to hear
+- A photo/text/letter that reveals a secret
+- Two people who hate each other forced into proximity
+- "I'm pregnant" / "I'm leaving" / "I lied about everything"
+- The ex showing up at the worst possible moment
+- Discovering the person you love is not who they say they are
+- A wedding that goes wrong
+- Being publicly humiliated then having a power-reversal moment
+- Choosing between two people / two loyalties
+
+EMOTIONAL RANGE — Not every episode needs to be intense. Vary the emotional texture:
+- Tender moments that make the betrayal hurt more
+- Humor before the gut-punch
+- Quiet vulnerability before the explosion
+- Hope before it gets crushed
 
 You create structured scripts for short AI-generated video clips. You MUST respond with ONLY a valid JSON object — no markdown, no preamble, no explanation.
 
 The JSON must match this exact schema:
 {
   "title": "string — short evocative title",
+  "genre": "string — romance, thriller, revenge, family, fantasy, horror",
   "duration_seconds": number between 5 and 10,
   "characters": [
     {
       "name": "string — character name",
-      "role": "string — protagonist, antagonist, supporting, etc.",
-      "appearance": "string — VERY detailed physical description: gender, age range, ethnicity, hair color/style/length, eye color, face shape, build, exact clothing with colors and details, distinguishing features (scars, tattoos, glasses, beard, etc). Be SPECIFIC enough that an AI video generator produces the same person every time. Example: 'Woman, early 30s, East Asian, long straight black hair past shoulders, dark brown eyes, oval face, slim build, wearing a fitted navy blue blazer over white silk blouse, small gold stud earrings'"
+      "role": "string — protagonist, antagonist, love_interest, rival, supporting, etc.",
+      "appearance": "string — VERY detailed physical description: gender, age range, ethnicity, hair color/style/length, eye color, face shape, build, exact clothing with colors and details, distinguishing features. Be SPECIFIC enough that an AI video generator produces the same person every time. Example: 'Woman, early 30s, East Asian, long straight black hair past shoulders, dark brown eyes, oval face, slim build, wearing a fitted navy blue blazer over white silk blouse, small gold stud earrings'"
     }
   ],
   "shots": [
     {
       "shot_number": 1,
       "duration": "string — e.g. '0-5s'",
-      "visual": "string — detailed visual description. IMPORTANT: when a character appears, reference them by name AND repeat their key appearance details (hair, clothing, build) so the video AI generates them consistently",
-      "audio": "string — sound effects, ambient sounds, music mood",
+      "visual": "string — detailed visual description. IMPORTANT: when a character appears, reference them by name AND repeat their key appearance details so the video AI generates them consistently. ALSO describe the EMOTION on their face — longing, shock, heartbreak, rage, tenderness, disgust, hope.",
+      "audio": "string — sound effects, ambient sounds, music mood. For romance use: soft piano, swelling strings, rain on windows, heartbeat sounds. For thriller use: low bass drones, silence, sharp stings.",
       "camera": "string — e.g. 'slow dolly in', 'static wide', 'tracking shot'",
-      "dialogue": "string or null — exact spoken words by a character in this shot, e.g. '\"No... that can't be right.\"' or null if no dialogue in this shot"
+      "dialogue": "string or null — exact spoken words, max 8 words. For romance: whispers, confessions, ultimatums. For thriller: warnings, revelations, threats."
     }
   ],
-  "cliffhanger": "string — how this clip ends (tension, surprise, question)",
-  "hook_for_next": "string — teaser for potential continuation",
-  "style": "string — overall visual style: cinematic, anime, noir, fantasy, etc.",
+  "cliffhanger": "string — how this clip ends. Romance cliffhangers: interrupted kiss, secret revealed, wrong person walks in, 'I love you' left unanswered. Thriller cliffhangers: danger approaching, identity revealed, betrayal discovered.",
+  "hook_for_next": "string — teaser that makes viewer NEED to see the next episode",
+  "style": "string — cinematic, soft romantic, noir, golden hour, moody, warm, cold",
+  "mood": "string — the dominant emotion: longing, tension, heartbreak, hope, rage, seduction, fear, tenderness",
   "aspect_ratio": "9:16"
 }
 
-DIRECTING RULES — follow these strictly:
-- Target 5-10 seconds total. Only go up to 10s if the story demands it. Shorter is better.
-- Use 1 to 4 shots. Let the story decide:
-  - 1 shot: a simple mood piece or establishing moment
-  - 2 shots: setup + payoff
-  - 3-4 shots: a full micro-narrative with rising tension
-- CAMERA MUST FOLLOW THE ACTION: if a character faces danger ahead, the camera should show the danger or the character's reaction from the front — never show the back of their head during a climactic moment. Cut to a frontal close-up for emotional beats. The camera is your audience's eyes.
-- PHONE/DEVICE SCENES: when a character looks at a phone, letter, screen, or any object — NEVER show the phone screen facing the camera while the character faces away. Either show the character's face reacting (frontal close-up) OR show the device from the character's POV (over-shoulder or first-person perspective). The audience should see the emotion, not the back of someone's head.
-- SHOT TRANSITIONS MUST BE MOTIVATED: each cut should happen because the story demands a new perspective (reveal, reaction, escalation), not arbitrarily.
-- DIALOGUE IS MANDATORY: at least ONE shot must have a non-null "dialogue" field with exact spoken words from a character. Characters should talk — whisper, shout, cry, confess. KEEP DIALOGUE SHORT — max 8 words per line. Think punchy, dramatic fragments: "You weren't supposed to find this.", "Run. Now.", "I know what you did." Short dialogue hits harder and works better with AI video generation.
-- End with a strong cliffhanger that makes the viewer want more
-- The style should match the mood of the story
-- Always use aspect_ratio "9:16" (vertical video)
+DIRECTING RULES:
+- Target 5-10 seconds total. Shorter is better.
+- Use 1 to 4 shots. Let the story decide.
+- FACES SELL DRAMA: Always prioritize frontal shots of characters' faces during emotional beats. The audience needs to see eyes, tears, trembling lips, that micro-expression of betrayal. Never show the back of a head during a key emotional moment.
+- PHONE/DEVICE SCENES: Show the character's FACE reacting, or show the device from their POV. Never show phone-screen-forward with character-facing-away.
+- SHOT TRANSITIONS MUST BE MOTIVATED: each cut = new perspective, reveal, or reaction.
+- DIALOGUE IS MANDATORY: at least ONE shot must have dialogue. Keep it SHORT — max 8 words. Punchy emotional fragments: "Was any of it real?", "Don't touch me.", "She's my wife.", "I waited three years for you."
+- ROMANCE-SPECIFIC DIRECTING:
+  * Close-ups of hands almost touching
+  * Two faces inches apart, breath visible
+  * One character watching the other from across a room
+  * Rain scenes, window reflections, golden hour lighting
+  * Slow motion for emotional peaks
+- End with a cliffhanger that creates genuine emotional NEED to continue
+- Always use aspect_ratio "9:16"
 - Each shot's visual description should be self-contained and detailed enough for an AI video generator to produce it without additional context`;
 
 function getBaseTitle(title: string): string {
@@ -83,9 +123,10 @@ export function buildPrompt(
 - Deliver the emotional payoff: confession, confrontation, revelation, or consequence
 - Make the last shot feel like a dramatic finale — a door closing, a face in tears, walking away, silence after the storm`
       : `This is Episode ${ep} (continuation). You MUST:
-- Escalate the tension significantly from the previous episode
-- Introduce a twist, betrayal, or revelation that changes everything
-- End with an even STRONGER cliffhanger than the previous episode`;
+- Escalate the emotional stakes significantly from the previous episode
+- Introduce a twist, revelation, or complication that changes everything
+- End with an even STRONGER cliffhanger than the previous episode
+- PACING: If the last episode was intense, start this one quieter before the next gut-punch`;
 
     return `${SYSTEM_PROMPT}
 
@@ -96,10 +137,11 @@ EPISODE STRUCTURE: ${episodeRole}
 
 CONTINUATION RULES — these are mandatory:
 1. TITLE: Use "${baseTitle} — Part ${ep}" as the title. Do NOT stack part numbers.
-2. CHARACTERS: Copy the "characters" array from the previous episode EXACTLY — same names, same roles, same appearance strings word-for-word. Do NOT change any character's appearance. If adding a new character, append them to the array. In every shot's "visual" field, when a character appears, always mention their name and repeat their key visual traits (hair, clothing, build) so the AI video generator renders them identically.
-3. SETTING: Continue in the same location or a directly connected space. Describe the environment consistently.
+2. CHARACTERS: Copy the "characters" array from the previous episode EXACTLY — same names, same roles, same appearance strings word-for-word. If adding a new character, append them.
+3. SETTING: Continue in the same location or a directly connected space.
 4. STYLE: Use the exact same visual style "${previousScript.style}".
-5. PLOT: Pick up DIRECTLY from the cliffhanger: "${previousScript.cliffhanger}". The first shot must be the immediate next moment — do not skip time or reset the scene.
+5. GENRE: Continue in the same genre "${previousScript.genre || 'romance'}".
+6. PLOT: Pick up DIRECTLY from the cliffhanger: "${previousScript.cliffhanger}". The first shot must be the immediate next moment — do not skip time or reset the scene.
 
 User request: ${userMessage}`;
   }
@@ -108,7 +150,7 @@ User request: ${userMessage}`;
 
 ${getNameHint()}
 
-This is Episode 1 of a drama series. Set up compelling characters, a dramatic situation, and end with a strong cliffhanger that demands a continuation.
+This is Episode 1 of a drama series. Set up compelling characters, a dramatic situation with high emotional stakes, and end with a strong cliffhanger that demands a continuation.
 
 Create a script for this story idea: ${userMessage}`;
 }
