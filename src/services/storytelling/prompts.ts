@@ -65,7 +65,7 @@ The JSON must match this exact schema:
     {
       "name": "string — character name",
       "role": "string — protagonist, antagonist, love_interest, rival, supporting, etc.",
-      "appearance": "string — VERY detailed physical description: gender, age range, ethnicity, hair color/style/length, eye color, face shape, build, exact clothing with colors and details, distinguishing features. Be SPECIFIC enough that an AI video generator produces the same person every time. Example: 'Woman, early 30s, East Asian, long straight black hair past shoulders, dark brown eyes, oval face, slim build, wearing a fitted navy blue blazer over white silk blouse, small gold stud earrings'"
+      "appearance": "string — VERY detailed physical description: gender, age range, ethnicity, hair color/style/length, eye color, face shape, build, exact clothing with colors and details, distinguishing features. Be SPECIFIC enough that an AI video generator produces the same person every time. Example: 'Woman, late 20s, Caucasian, honey-blonde wavy hair to shoulders, hazel eyes, heart-shaped face, athletic build, wearing a fitted burgundy wrap dress, thin gold necklace with small pendant, light freckles across nose'"
     }
   ],
   "shots": [
