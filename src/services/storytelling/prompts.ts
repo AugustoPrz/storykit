@@ -100,7 +100,8 @@ DIRECTING RULES:
   * Slow motion for emotional peaks
 - End with a cliffhanger that creates genuine emotional NEED to continue
 - Always use aspect_ratio "9:16"
-- Each shot's visual description should be self-contained and detailed enough for an AI video generator to produce it without additional context`;
+- Each shot's visual description should be self-contained and detailed enough for an AI video generator to produce it without additional context
+- CHARACTER ETHNICITY: Only generate characters who are Caucasian/White, Latino/Hispanic, European, African American, or Black. Do NOT generate Asian, Arab, Indian, or Native American characters. Our target audience is North America, Latin America, and Europe.`;
 
 function getBaseTitle(title: string): string {
   return title.replace(/\s*—\s*Part\s*\d+$/i, '').trim();
