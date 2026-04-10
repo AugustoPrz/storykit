@@ -70,14 +70,32 @@ function buildV3Payload(script: Script) {
 }
 
 function buildO3Payload(script: Script, referenceVideoUrl: string) {
+  // O3 reference-to-video does NOT support multi_shot/multi_prompt.
+  // We craft one rich cinematic prompt combining all shots sequentially.
   const charSummary = buildCharacterSummary(script);
-  const shotPrompts = script.shots
-    .slice(0, MAX_SHOTS)
-    .map((s) => buildShotPrompt(s))
-    .join(' | ');
-  const raw = charSummary
-    ? `Characters: ${charSummary}. Shots: ${shotPrompts}`
-    : shotPrompts;
+  const shots = script.shots.slice(0, MAX_SHOTS);
+
+  const parts: string[] = [];
+
+  if (charSummary) {
+    parts.push(`Characters: ${charSummary}`);
+  }
+
+  parts.push(`Style: ${script.style}. ${shots.length}-shot cinematic sequence:`);
+
+  shots.forEach((shot, i) => {
+    let shotDesc = `Shot ${i + 1}: [${shot.camera}] ${shot.visual}`;
+    if (shot.dialogue) {
+      shotDesc += ` Character says: "${shot.dialogue}"`;
+    }
+    parts.push(shotDesc);
+  });
+
+  if (script.cliffhanger && script.cliffhanger !== 'END') {
+    parts.push(`The scene ends with: ${script.cliffhanger}`);
+  }
+
+  const raw = parts.join('. ');
   const prompt = raw.length > 2500 ? raw.slice(0, 2497) + '...' : raw;
 
   return {

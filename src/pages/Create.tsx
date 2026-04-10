@@ -161,11 +161,34 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
     setGenerationStatus({ phase: 'generating', progress: 0, message: 'ANALYZING SCRIPT...' });
 
     try {
-      // Use parent clip's video URL for O3 reference
-      const parentClip = currentClip.parentClipId
-        ? clips.find((c) => c.id === currentClip.parentClipId)
-        : undefined;
-      const referenceVideoUrl = parentClip?.videoUrl || undefined;
+      // Find reference video: parent clip, or any clip in this chat session with video
+      let referenceVideoUrl: string | undefined;
+
+      // First try parent clip
+      if (currentClip.parentClipId) {
+        const parentClip = clips.find((c) => c.id === currentClip.parentClipId);
+        referenceVideoUrl = parentClip?.videoUrl;
+      }
+
+      // Fallback: find any clip in chat messages that has a video (not the current clip)
+      if (!referenceVideoUrl) {
+        for (const msg of chatMessages) {
+          if (msg.clipId && msg.clipId !== currentClipId) {
+            const msgClip = clips.find((c) => c.id === msg.clipId);
+            if (msgClip?.videoUrl) {
+              referenceVideoUrl = msgClip.videoUrl;
+              break;
+            }
+          }
+        }
+      }
+
+      console.log('[StoryKit] Generate video:', {
+        currentClipId,
+        parentClipId: currentClip.parentClipId,
+        referenceVideoUrl: referenceVideoUrl ? 'found' : 'none',
+        model: referenceVideoUrl ? 'O3' : 'V3',
+      });
 
       const result = await generateVideo(
         currentClip.script,
