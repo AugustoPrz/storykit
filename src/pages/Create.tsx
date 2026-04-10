@@ -9,9 +9,11 @@ import './Create.css';
 
 interface Props {
   onViewChange: (view: AppView) => void;
+  continueFromClipId?: string | null;
+  onContinueHandled?: () => void;
 }
 
-export default function Create({ onViewChange }: Props) {
+export default function Create({ onViewChange, continueFromClipId, onContinueHandled }: Props) {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -39,6 +41,28 @@ export default function Create({ onViewChange }: Props) {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages, generationStatus]);
+
+  // Handle continue-from-clip triggered from gallery
+  useEffect(() => {
+    if (continueFromClipId && !isWorking) {
+      const clip = clips.find((c) => c.id === continueFromClipId);
+      if (clip?.script) {
+        clearChat();
+        setCurrentClipId(clip.id);
+        addMessage({
+          id: crypto.randomUUID(),
+          role: 'assistant',
+          content: '',
+          timestamp: Date.now(),
+          script: clip.script,
+          clipId: clip.id,
+        });
+        onContinueHandled?.();
+        // Auto-trigger continuation
+        setTimeout(() => handleSend('Continue the story'), 100);
+      }
+    }
+  }, [continueFromClipId]);
 
   const handleSend = async (overrideText?: string) => {
     const text = (overrideText ?? input).trim();

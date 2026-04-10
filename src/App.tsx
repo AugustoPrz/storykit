@@ -12,8 +12,14 @@ export type AppView = 'create' | 'clips';
 export default function App() {
   const [view, setView] = useState<AppView>('create');
   const [playerId, setPlayerId] = useState<string | null>(null);
+  const [continueFromClipId, setContinueFromClipId] = useState<string | null>(null);
   const creditsUsed = useClipsStore((s) => s.creditsUsed);
   const clipCount = useClipsStore((s) => s.clips.filter((c) => c.videoUrl).length);
+
+  const handleContinueFromClip = (clipId: string) => {
+    setContinueFromClipId(clipId);
+    setView('create');
+  };
 
   return (
     <div className="app">
@@ -29,14 +35,22 @@ export default function App() {
 
       <main className="app-content">
         {view === 'create' ? (
-          <Create onViewChange={setView} />
+          <Create
+            onViewChange={setView}
+            continueFromClipId={continueFromClipId}
+            onContinueHandled={() => setContinueFromClipId(null)}
+          />
         ) : (
           <Clips onPlay={setPlayerId} onViewChange={setView} />
         )}
       </main>
 
       {playerId && (
-        <ClipPlayer clipId={playerId} onClose={() => setPlayerId(null)} />
+        <ClipPlayer
+          clipId={playerId}
+          onClose={() => setPlayerId(null)}
+          onContinue={handleContinueFromClip}
+        />
       )}
     </div>
   );

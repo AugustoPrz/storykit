@@ -104,14 +104,31 @@
   border-color: var(--text);
 }
 
-.player-modal__btn--danger {
+.player-modal__btn--accent {
   color: var(--accent);
   border-color: var(--accent);
 }
 
-.player-modal__btn--danger:hover {
+.player-modal__btn--accent:hover {
   background: var(--accent);
   color: #000;
+}
+
+.player-modal__btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  flex-shrink: 0;
+  padding: 8px;
+  border: 0.5px solid var(--border);
+  color: var(--dim);
+  transition: all 150ms linear;
+}
+
+.player-modal__btn-icon--danger:hover {
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 .player-modal__not-found {
