@@ -27,7 +27,6 @@ function buildMultiPrompt(script: Script) {
   const shots = script.shots.slice(0, MAX_SHOTS);
   return shots.map((shot, i) => {
     let prompt = buildShotPrompt(shot);
-    // Append cliffhanger to the last shot so the video ends with that action
     if (i === shots.length - 1 && script.cliffhanger && script.cliffhanger !== 'END') {
       const cliffText = ` The scene ends with: ${script.cliffhanger}`;
       if (prompt.length + cliffText.length <= MAX_SHOT_PROMPT_CHARS) {
@@ -49,14 +48,18 @@ function buildCharacterSummary(script: Script): string {
     .join('. ');
 }
 
-function buildV3Payload(script: Script) {
+function buildMainPrompt(script: Script): string {
   const charSummary = buildCharacterSummary(script);
-  const prompt = charSummary
+  return charSummary
     ? `${script.title}. Characters: ${charSummary}`.slice(0, 2500)
     : script.title;
+}
+
+// Episode 1: text-to-video with multishot
+function buildV3TextPayload(script: Script) {
   return {
     model: 'kling-v3-text-to-video',
-    prompt,
+    prompt: buildMainPrompt(script),
     duration: Math.max(3, Math.min(10, script.duration_seconds)),
     aspect_ratio: script.aspect_ratio || '9:16',
     quality: '720p',
@@ -69,43 +72,21 @@ function buildV3Payload(script: Script) {
   };
 }
 
-function buildO3Payload(script: Script, referenceVideoUrl: string) {
-  // O3 reference-to-video does NOT support multi_shot/multi_prompt.
-  // We craft one rich cinematic prompt combining all shots sequentially.
-  const charSummary = buildCharacterSummary(script);
-  const shots = script.shots.slice(0, MAX_SHOTS);
-
-  const parts: string[] = [];
-
-  if (charSummary) {
-    parts.push(`Characters: ${charSummary}`);
-  }
-
-  parts.push(`Style: ${script.style}. ${shots.length}-shot cinematic sequence:`);
-
-  shots.forEach((shot, i) => {
-    let shotDesc = `Shot ${i + 1}: [${shot.camera}] ${shot.visual}`;
-    if (shot.dialogue) {
-      shotDesc += ` Character says: "${shot.dialogue}"`;
-    }
-    parts.push(shotDesc);
-  });
-
-  if (script.cliffhanger && script.cliffhanger !== 'END') {
-    parts.push(`The scene ends with: ${script.cliffhanger}`);
-  }
-
-  const raw = parts.join('. ');
-  const prompt = raw.length > 2500 ? raw.slice(0, 2497) + '...' : raw;
-
+// Episode 2+: image-to-video with last frame as image_start + multishot
+function buildV3ImagePayload(script: Script, lastFrameDataUrl: string) {
   return {
-    model: 'kling-o3-reference-to-video',
-    prompt,
-    video_url: referenceVideoUrl,
-    keep_original_sound: false,
+    model: 'kling-v3-image-to-video',
+    image_start: lastFrameDataUrl,
+    prompt: buildMainPrompt(script),
     duration: Math.max(3, Math.min(10, script.duration_seconds)),
     aspect_ratio: script.aspect_ratio || '9:16',
     quality: '720p',
+    sound: 'on',
+    model_params: {
+      multi_shot: true,
+      shot_type: 'customize',
+      multi_prompt: buildMultiPrompt(script),
+    },
   };
 }
 
@@ -137,11 +118,8 @@ async function createTask(
 async function pollTask(
   taskId: string,
   apiKey: string,
-  onProgress: (progress: number, message: string) => void,
-  isO3: boolean
+  onProgress: (progress: number, message: string) => void
 ): Promise<string> {
-  const label = isO3 ? 'KLING O3' : 'KLING V3';
-
   for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
     await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
 
@@ -162,13 +140,13 @@ async function pollTask(
     }
 
     if (data.status === 'failed') {
-      throw new Error(`${label} generation failed: ${JSON.stringify(data)}`);
+      throw new Error(`KLING V3 generation failed: ${JSON.stringify(data)}`);
     }
 
     const p = (data.progress ?? 0) / 100;
     const phase =
       p < 0.2
-        ? `SUBMITTING TO ${label}...`
+        ? 'SUBMITTING TO KLING V3...'
         : p < 0.5
           ? 'GENERATING SHOTS...'
           : p < 0.8
@@ -177,37 +155,44 @@ async function pollTask(
     onProgress(Math.max(0.05, p), phase);
   }
 
-  throw new Error(`${label} generation timed out after 10 minutes`);
+  throw new Error('KLING V3 generation timed out after 10 minutes');
 }
 
 export async function generateVideo(
   script: Script,
   onProgress: (progress: number, message: string) => void,
-  referenceVideoUrl?: string
+  lastFrameDataUrl?: string
 ): Promise<VideoGenerationResponse> {
   const apiKey = import.meta.env.VITE_KLING_API_KEY;
   if (!apiKey || apiKey === 'your_kling_key_here') {
     throw new Error('Missing Kling API key. Add VITE_KLING_API_KEY to your .env file.');
   }
 
-  const isO3 = !!referenceVideoUrl;
+  const isImageToVideo = !!lastFrameDataUrl;
   const startTime = Date.now();
 
-  onProgress(0, isO3 ? 'PREPARING O3 REFERENCE REQUEST...' : 'PREPARING V3 MULTISHOT REQUEST...');
+  onProgress(0, isImageToVideo
+    ? 'PREPARING V3 IMAGE-TO-VIDEO...'
+    : 'PREPARING V3 MULTISHOT REQUEST...');
 
-  const payload = isO3
-    ? buildO3Payload(script, referenceVideoUrl)
-    : buildV3Payload(script);
+  const payload = isImageToVideo
+    ? buildV3ImagePayload(script, lastFrameDataUrl)
+    : buildV3TextPayload(script);
+
+  console.log('[StoryKit] Generate video:', {
+    model: isImageToVideo ? 'V3 image-to-video' : 'V3 text-to-video',
+    hasLastFrame: isImageToVideo,
+    shots: script.shots.length,
+  });
 
   const { taskId } = await createTask(payload, apiKey);
   onProgress(0.05, 'TASK SUBMITTED, GENERATING...');
 
-  const videoUrl = await pollTask(taskId, apiKey, onProgress, isO3);
+  const videoUrl = await pollTask(taskId, apiKey, onProgress);
 
-  // V3 720p + sound = 8.1 cr/s, O3 720p = 8.1 cr/s
+  // V3 720p + sound = 8.1 cr/s
   const rate = 8.1;
-  const maxDuration = isO3 ? 10 : 10;
-  const billedDuration = Math.max(3, Math.min(maxDuration, script.duration_seconds));
+  const billedDuration = Math.max(3, Math.min(10, script.duration_seconds));
   const creditsUsed = billedDuration * rate;
 
   return {

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useClipsStore } from '../store/clips';
 import { generateScript } from '../services/storytelling/gemini';
 import { generateVideo } from '../services/video-generation';
+import { extractLastFrame } from '../utils/extractFrame';
 import ChatMessage from '../components/ChatMessage';
 import type { ChatMessage as ChatMessageType } from '../services/video-generation/types';
 import type { AppView } from '../App';
@@ -161,33 +162,42 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
     setGenerationStatus({ phase: 'generating', progress: 0, message: 'ANALYZING SCRIPT...' });
 
     try {
-      // Find reference video: parent clip, or any clip in this chat session with video
-      let referenceVideoUrl: string | undefined;
+      // Find the previous clip with a video to extract last frame for continuation
+      let lastFrameDataUrl: string | undefined;
 
       // First try parent clip
+      let prevVideoUrl: string | undefined;
       if (currentClip.parentClipId) {
         const parentClip = clips.find((c) => c.id === currentClip.parentClipId);
-        referenceVideoUrl = parentClip?.videoUrl;
+        prevVideoUrl = parentClip?.videoUrl;
       }
-
-      // Fallback: find any clip in chat messages that has a video (not the current clip)
-      if (!referenceVideoUrl) {
+      // Fallback: find any clip in chat messages that has a video
+      if (!prevVideoUrl) {
         for (const msg of chatMessages) {
           if (msg.clipId && msg.clipId !== currentClipId) {
             const msgClip = clips.find((c) => c.id === msg.clipId);
             if (msgClip?.videoUrl) {
-              referenceVideoUrl = msgClip.videoUrl;
+              prevVideoUrl = msgClip.videoUrl;
               break;
             }
           }
         }
       }
 
+      // Extract last frame from previous video for image-to-video continuity
+      if (prevVideoUrl) {
+        try {
+          setGenerationStatus({ phase: 'generating', progress: 0, message: 'EXTRACTING LAST FRAME...' });
+          lastFrameDataUrl = await extractLastFrame(prevVideoUrl);
+          console.log('[StoryKit] Last frame extracted, using V3 image-to-video');
+        } catch (err) {
+          console.warn('[StoryKit] Could not extract last frame, falling back to text-to-video', err);
+        }
+      }
+
       console.log('[StoryKit] Generate video:', {
-        currentClipId,
-        parentClipId: currentClip.parentClipId,
-        referenceVideoUrl: referenceVideoUrl ? 'found' : 'none',
-        model: referenceVideoUrl ? 'O3' : 'V3',
+        model: lastFrameDataUrl ? 'V3 image-to-video' : 'V3 text-to-video',
+        hasLastFrame: !!lastFrameDataUrl,
       });
 
       const result = await generateVideo(
@@ -195,7 +205,7 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
         (progress, message) => {
           setGenerationStatus({ phase: 'generating', progress, message });
         },
-        referenceVideoUrl
+        lastFrameDataUrl
       );
 
       updateClip(currentClipId, {
