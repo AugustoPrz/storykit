@@ -317,6 +317,7 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
             placeholder="Describe your story..."
             value={input}
             rows={1}
+            maxLength={110}
             onChange={(e) => {
               setInput(e.target.value);
               e.target.style.height = 'auto';

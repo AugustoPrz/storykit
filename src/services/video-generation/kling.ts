@@ -60,7 +60,7 @@ function buildV3TextPayload(script: Script) {
   return {
     model: 'kling-v3-text-to-video',
     prompt: buildMainPrompt(script),
-    duration: Math.max(3, Math.min(10, script.duration_seconds)),
+    duration: Math.max(3, Math.min(15, script.duration_seconds)),
     aspect_ratio: script.aspect_ratio || '9:16',
     quality: '720p',
     sound: 'on',
@@ -78,7 +78,7 @@ function buildV3ImagePayload(script: Script, lastFrameDataUrl: string) {
     model: 'kling-v3-image-to-video',
     image_start: lastFrameDataUrl,
     prompt: buildMainPrompt(script),
-    duration: Math.max(3, Math.min(10, script.duration_seconds)),
+    duration: Math.max(3, Math.min(15, script.duration_seconds)),
     aspect_ratio: script.aspect_ratio || '9:16',
     quality: '720p',
     sound: 'on',
@@ -192,7 +192,7 @@ export async function generateVideo(
 
   // V3 720p + sound = 8.1 cr/s
   const rate = 8.1;
-  const billedDuration = Math.max(3, Math.min(10, script.duration_seconds));
+  const billedDuration = Math.max(3, Math.min(15, script.duration_seconds));
   const creditsUsed = billedDuration * rate;
 
   return {
