@@ -1,10 +1,10 @@
+import { useEffect, useRef } from 'react';
 import './Landing.css';
 
 interface Props {
   onSkip: () => void;
 }
 
-// Unsplash photos that look like drama/romance thumbnails (free to use)
 const IMAGES = [
   'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=300&h=500&fit=crop',
   'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=500&fit=crop',
@@ -32,38 +32,62 @@ const IMAGES = [
   'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=300&h=500&fit=crop',
 ];
 
-const TITLES = [
-  'The Last Confession', 'Broken Vows', 'Midnight Lies', 'His Secret Wife',
-  'The Billionaire\'s Deal', 'Stolen Hearts', 'Behind Closed Doors', 'Forbidden',
-  'The Other Woman', 'Shattered Trust', 'Golden Cage', 'Whispered Sins',
-  'The Betrayal', 'After You Left', 'Dangerous Love', 'The Arrangement',
-  'Torn Apart', 'Silent Promises', 'The Inheritance', 'Unforgivable',
-  'His True Face', 'The Return', 'Burning Bridges', 'One Last Chance',
-];
+const LIKES = IMAGES.map((_, i) => `${(Math.floor(i * 137.3 + 100) % 900 + 100).toFixed(0)}.${(i * 3) % 10}K`);
 
-const PLACEHOLDERS = IMAGES.map((img, i) => ({
-  id: i,
-  tall: i % 5 === 0,
-  image: img,
-  likes: `${(Math.floor(i * 137.3 + 100) % 900 + 100).toFixed(0)}.${(i * 3) % 10}K`,
-  title: TITLES[i],
-}));
+// Split images into columns (5 cols, 5 images each, duplicated for infinite scroll)
+function buildColumns(colCount: number) {
+  const cols: { image: string; likes: string }[][] = Array.from({ length: colCount }, () => []);
+  IMAGES.forEach((img, i) => {
+    cols[i % colCount].push({ image: img, likes: LIKES[i] });
+  });
+  // Duplicate each column for seamless loop
+  return cols.map((col) => [...col, ...col, ...col]);
+}
 
 export default function Landing({ onSkip }: Props) {
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const columns = gridRef.current?.querySelectorAll('.landing__column');
+    if (!columns) return;
+
+    const animations: Animation[] = [];
+    columns.forEach((col, i) => {
+      const inner = col.querySelector('.landing__column-inner') as HTMLElement;
+      if (!inner) return;
+      const dir = i % 2 === 0 ? -1 : 1;
+      const duration = 25000 + i * 5000;
+      const totalHeight = inner.scrollHeight / 3; // since we tripled the content
+
+      const anim = inner.animate(
+        [
+          { transform: `translateY(${dir === -1 ? '0px' : `-${totalHeight}px`})` },
+          { transform: `translateY(${dir === -1 ? `-${totalHeight}px` : '0px'})` },
+        ],
+        { duration, iterations: Infinity, easing: 'linear' }
+      );
+      animations.push(anim);
+    });
+
+    return () => animations.forEach((a) => a.cancel());
+  }, []);
+
+  const cols = buildColumns(5);
+
   return (
     <div className="landing">
-      <div className="landing__grid">
-        {PLACEHOLDERS.map((item) => (
-          <div
-            key={item.id}
-            className={`landing__card ${item.tall ? 'landing__card--tall' : ''}`}
-          >
-            <img src={item.image} alt="" className="landing__media" loading="lazy" />
-            <div className="landing__card-inner">
-              <span className="landing__card-title">{item.title}</span>
-            </div>
-            <div className="landing__overlay">
-              <span className="landing__likes">{item.likes}</span>
+      <div className="landing__grid" ref={gridRef}>
+        {cols.map((col, ci) => (
+          <div key={ci} className="landing__column">
+            <div className="landing__column-inner">
+              {col.map((item, ii) => (
+                <div key={ii} className="landing__card">
+                  <img src={item.image} alt="" className="landing__media" loading="lazy" />
+                  <div className="landing__card-likes">
+                    <span className="landing__likes">{item.likes}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         ))}
