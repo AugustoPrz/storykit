@@ -1,13 +1,13 @@
 import type { Script } from '../video-generation/types';
 
 const NAME_POOLS = [
-  ['Yuki', 'Kenji', 'Amara', 'Dmitri', 'Priya', 'Tomás', 'Ines', 'Ravi'],
-  ['Seo-yeon', 'Kwame', 'Leila', 'Viktor', 'Chiara', 'Arlo', 'Fatima', 'Oleg'],
-  ['Nadia', 'Haruto', 'Zara', 'Emeka', 'Lena', 'Mateo', 'Aisha', 'Soren'],
-  ['Ren', 'Dalia', 'Kofi', 'Maren', 'Idris', 'Yara', 'Tobias', 'Jin'],
-  ['Esme', 'Kian', 'Solange', 'Nikolai', 'Mei', 'Dante', 'Ingrid', 'Tariq'],
   ['Bryce', 'Cassandra', 'Wyatt', 'Jocelyn', 'Trent', 'Morgan', 'Devin', 'Shelby'],
   ['Carter', 'Naomi', 'Wesley', 'Autumn', 'Malik', 'Brooklyn', 'Travis', 'Kendra'],
+  ['Garrett', 'Vivian', 'Colton', 'Paige', 'Donovan', 'Sienna', 'Reed', 'Camille'],
+  ['Tomás', 'Valentina', 'Santiago', 'Lucía', 'Andrés', 'Renata', 'Diego', 'Catalina'],
+  ['Mateo', 'Isabella', 'Rodrigo', 'Camila', 'Emilio', 'Fernanda', 'Nicolás', 'Sofía'],
+  ['Dante', 'Chiara', 'Luca', 'Ingrid', 'Soren', 'Maren', 'Viktor', 'Lena'],
+  ['Hugo', 'Margaux', 'Álvaro', 'Céline', 'Adrián', 'Eloise', 'Marcel', 'Nadia'],
 ];
 
 function getNameHint(): string {
