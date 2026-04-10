@@ -124,12 +124,25 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
         }
       }
       const isFinalEpisode = text.toUpperCase().includes('END');
-      const script = await generateScript(
+      const rawScript = await generateScript(
         text,
         refClip ? previousScript : undefined,
         refClip ? episodeNumber : undefined,
         refClip ? isFinalEpisode : undefined
       );
+
+      // Force-inherit character descriptions from previous episode
+      // Gemini may regenerate them differently — override with the actual edited descriptions
+      let script = rawScript;
+      if (previousScript?.characters?.length) {
+        const prevCharNames = new Set(previousScript.characters.map((c) => c.name));
+        // Keep previous characters exactly as edited, append any new ones Gemini created
+        const newChars = (rawScript.characters || []).filter((c) => !prevCharNames.has(c.name));
+        script = {
+          ...rawScript,
+          characters: [...previousScript.characters, ...newChars],
+        };
+      }
 
       updateMessage(assistantMsgId, {
         content: '',
