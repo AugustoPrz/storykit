@@ -47,7 +47,21 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
     if (continueFromClipId && !isWorking) {
       const clip = clips.find((c) => c.id === continueFromClipId);
       if (clip?.script) {
+        // Clear chat and set up the clip as the current context
         clearChat();
+        // Re-add the clip with its video as the starting point
+        addClip({
+          id: clip.id,
+          title: clip.title,
+          prompt: clip.prompt,
+          script: clip.script,
+          videoUrl: clip.videoUrl,
+          thumbnailUrl: clip.thumbnailUrl,
+          duration: clip.duration,
+          createdAt: clip.createdAt,
+          style: clip.style,
+          parentClipId: clip.parentClipId,
+        });
         setCurrentClipId(clip.id);
         addMessage({
           id: crypto.randomUUID(),
@@ -58,8 +72,6 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
           clipId: clip.id,
         });
         onContinueHandled?.();
-        // Auto-trigger continuation
-        setTimeout(() => handleSend('Continue the story'), 100);
       }
     }
   }, [continueFromClipId]);
@@ -89,30 +101,31 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
     setGenerationStatus({ phase: 'scripting', progress: 0, message: 'WRITING SCRIPT...' });
 
     try {
-      // Find clips referenced in this chat session (by IDs in chat messages or current chain)
-      const sessionClipIds = new Set(
-        chatMessages.filter((m) => m.script).map((m) => m.clipId).filter(Boolean)
-      );
-      if (currentClipId) sessionClipIds.add(currentClipId);
-      // Walk parent chain to include all ancestors
-      let walkId = currentClip?.parentClipId;
-      while (walkId) {
-        sessionClipIds.add(walkId);
-        const w = clips.find((c) => c.id === walkId);
-        walkId = w?.parentClipId;
+      // Find the last clip with a video to use as reference for continuation
+      // Priority: currentClip (if it has video) > any clip in chat with video
+      const refClip = currentClip?.videoUrl
+        ? currentClip
+        : clips.find((c) => {
+            const inChat = chatMessages.some((m) => m.clipId === c.id);
+            return inChat && c.videoUrl;
+          });
+      const previousScript = refClip?.script;
+      // Count episodes by walking the parent chain from the reference clip
+      let episodeNumber = 1;
+      if (refClip) {
+        let wId: string | undefined = refClip.id;
+        while (wId) {
+          episodeNumber++;
+          const w = clips.find((c) => c.id === wId);
+          wId = w?.parentClipId;
+        }
       }
-      // Last video in this session for reference
-      const lastVideoClip = clips.find((c) => sessionClipIds.has(c.id) && c.videoUrl);
-      const previousScript = lastVideoClip?.script ?? currentClip?.script;
-      // Count session clips with videos for episode numbering
-      const videoClipCount = clips.filter((c) => sessionClipIds.has(c.id) && c.videoUrl).length;
-      const episodeNumber = videoClipCount + 1;
       const isFinalEpisode = text.toUpperCase().includes('END');
       const script = await generateScript(
         text,
-        lastVideoClip ? previousScript : undefined,
-        lastVideoClip ? episodeNumber : undefined,
-        lastVideoClip ? isFinalEpisode : undefined
+        refClip ? previousScript : undefined,
+        refClip ? episodeNumber : undefined,
+        refClip ? isFinalEpisode : undefined
       );
 
       updateMessage(assistantMsgId, {
@@ -148,13 +161,11 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
     setGenerationStatus({ phase: 'generating', progress: 0, message: 'ANALYZING SCRIPT...' });
 
     try {
-      // Use the most recently generated video in this session as O3 reference
-      const sessionMsgClipIds = new Set(
-        chatMessages.filter((m) => m.script).map((m) => m.clipId).filter(Boolean)
-      );
-      if (currentClipId) sessionMsgClipIds.add(currentClipId);
-      const lastVideoClip = clips.find((c) => sessionMsgClipIds.has(c.id) && c.videoUrl && c.id !== currentClipId);
-      const referenceVideoUrl = lastVideoClip?.videoUrl || undefined;
+      // Use parent clip's video URL for O3 reference
+      const parentClip = currentClip.parentClipId
+        ? clips.find((c) => c.id === currentClip.parentClipId)
+        : undefined;
+      const referenceVideoUrl = parentClip?.videoUrl || undefined;
 
       const result = await generateVideo(
         currentClip.script,
