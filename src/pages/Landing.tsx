@@ -57,7 +57,7 @@ export default function Landing({ onSkip }: Props) {
       const inner = col.querySelector('.landing__column-inner') as HTMLElement;
       if (!inner) return;
       const dir = i % 2 === 0 ? -1 : 1;
-      const duration = 25000 + i * 5000;
+      const duration = 60000 + i * 10000;
       const totalHeight = inner.scrollHeight / 3; // since we tripled the content
 
       const anim = inner.animate(
