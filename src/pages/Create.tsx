@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useClipsStore } from '../store/clips';
 import { generateScript } from '../services/storytelling/gemini';
+import { buildPrompt } from '../services/storytelling/prompts';
 import { generateVideo } from '../services/video-generation';
 import { extractLastFrame } from '../utils/extractFrame';
 import ChatMessage from '../components/ChatMessage';
@@ -16,6 +17,7 @@ interface Props {
 
 export default function Create({ onViewChange, continueFromClipId, onContinueHandled }: Props) {
   const [input, setInput] = useState('');
+  const [showPrompt, setShowPrompt] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -253,14 +255,24 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
   return (
     <div className="create">
       <div className="create__actions">
-        <button className="create__switch-btn" onClick={() => onViewChange('clips')}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <rect x="3" y="3" width="7" height="7" />
-            <rect x="14" y="3" width="7" height="7" />
-            <rect x="3" y="14" width="7" height="7" />
-            <rect x="14" y="14" width="7" height="7" />
-          </svg>
-        </button>
+        <div className="create__left-actions">
+          <button className="create__switch-btn" onClick={() => onViewChange('clips')}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+            </svg>
+          </button>
+          <button className="create__switch-btn" onClick={() => setShowPrompt(true)} title="View prompt">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+          </button>
+        </div>
         {chatMessages.length > 0 && (
           <button className="create__new" onClick={handleNew}>NEW</button>
         )}
@@ -325,6 +337,42 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
           </button>
         </div>
       </div>
+
+      {showPrompt && (
+        <div className="create__prompt-overlay" onClick={() => setShowPrompt(false)}>
+          <div className="create__prompt-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="create__prompt-header">
+              <span className="create__prompt-title">SCRIPT PROMPT</span>
+              <button className="create__prompt-close" onClick={() => setShowPrompt(false)}>&times;</button>
+            </div>
+            <pre className="create__prompt-body">
+              {(() => {
+                const refClip = currentClip?.videoUrl
+                  ? currentClip
+                  : clips.find((c) => {
+                      const inChat = chatMessages.some((m) => m.clipId === c.id);
+                      return inChat && c.videoUrl;
+                    });
+                const prevScript = refClip?.script;
+                let epNum = 1;
+                if (refClip) {
+                  let wId: string | undefined = refClip.id;
+                  while (wId) {
+                    epNum++;
+                    const w = clips.find((c) => c.id === wId);
+                    wId = w?.parentClipId;
+                  }
+                }
+                return buildPrompt(
+                  input || 'Continue the story',
+                  prevScript ?? undefined,
+                  prevScript ? epNum : undefined
+                );
+              })()}
+            </pre>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
