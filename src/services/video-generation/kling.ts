@@ -24,11 +24,22 @@ function parseShotDuration(duration: string): string {
 }
 
 function buildMultiPrompt(script: Script) {
-  return script.shots.slice(0, MAX_SHOTS).map((shot, i) => ({
-    index: i + 1,
-    prompt: buildShotPrompt(shot),
-    duration: parseShotDuration(shot.duration),
-  }));
+  const shots = script.shots.slice(0, MAX_SHOTS);
+  return shots.map((shot, i) => {
+    let prompt = buildShotPrompt(shot);
+    // Append cliffhanger to the last shot so the video ends with that action
+    if (i === shots.length - 1 && script.cliffhanger && script.cliffhanger !== 'END') {
+      const cliffText = ` The scene ends with: ${script.cliffhanger}`;
+      if (prompt.length + cliffText.length <= MAX_SHOT_PROMPT_CHARS) {
+        prompt += cliffText;
+      }
+    }
+    return {
+      index: i + 1,
+      prompt,
+      duration: parseShotDuration(shot.duration),
+    };
+  });
 }
 
 function buildCharacterSummary(script: Script): string {
