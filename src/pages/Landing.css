@@ -79,6 +79,25 @@
   z-index: 10;
 }
 
+@media (min-width: 1024px) {
+  .landing__hero {
+    inset: 0 0 0 auto;
+    width: 400px;
+    align-items: flex-start;
+    text-align: left;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.85) 20%, rgba(0, 0, 0, 0.95) 100%);
+    padding: 60px 40px;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 1400px) {
+  .landing__hero {
+    width: 480px;
+    padding: 60px 50px;
+  }
+}
+
 .landing__title {
   font-family: var(--mono);
   font-size: 32px;
