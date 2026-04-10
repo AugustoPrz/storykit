@@ -42,6 +42,28 @@
   padding: 8px 0;
 }
 
+.script-card__duration-input {
+  display: block;
+  width: 60px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid var(--border);
+  padding: 4px 8px;
+  -moz-appearance: textfield;
+}
+
+.script-card__duration-input::-webkit-inner-spin-button,
+.script-card__duration-input::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+.script-card__duration-input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
 .script-card__shot-header {
   display: flex;
   justify-content: space-between;

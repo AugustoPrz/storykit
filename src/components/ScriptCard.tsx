@@ -81,6 +81,12 @@ export default function ScriptCard({
     onScriptUpdate({ ...script, cliffhanger: value });
   };
 
+  const updateDuration = (value: number) => {
+    if (!onScriptUpdate) return;
+    const clamped = Math.max(3, Math.min(10, value));
+    onScriptUpdate({ ...script, duration_seconds: clamped });
+  };
+
   return (
     <div className="script-card">
       <div className="script-card__header">
@@ -94,8 +100,19 @@ export default function ScriptCard({
           <span className="script-card__value">{script.style}</span>
         </div>
         <div>
-          <span className="script-card__label">DURATION</span>
-          <span className="script-card__value">{script.duration_seconds}s</span>
+          <span className="script-card__label">DURATION (3-10s)</span>
+          {isEditable ? (
+            <input
+              className="script-card__duration-input"
+              type="number"
+              min={3}
+              max={10}
+              value={script.duration_seconds}
+              onChange={(e) => updateDuration(Number(e.target.value))}
+            />
+          ) : (
+            <span className="script-card__value">{script.duration_seconds}s</span>
+          )}
         </div>
       </div>
 
