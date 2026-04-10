@@ -17,6 +17,18 @@
   margin: 8px;
 }
 
+@media (min-width: 1024px) {
+  .landing__grid {
+    right: 400px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .landing__grid {
+    right: 480px;
+  }
+}
+
 .landing__column {
   flex: 1;
   min-width: 0;
