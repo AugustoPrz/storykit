@@ -29,7 +29,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <span className="app-title">STORYKIT</span>
+        <span className="app-title">DRAMAMIX</span>
         {creditsUsed > 0 && (
           <span className="app-credits">
             {creditsUsed.toFixed(1)} CR · ${(creditsUsed * USD_PER_CREDIT).toFixed(2)}

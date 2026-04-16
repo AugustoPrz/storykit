@@ -95,7 +95,7 @@ export default function Landing({ onSkip }: Props) {
       </div>
 
       <div className="landing__hero">
-        <h1 className="landing__title">STORYKIT</h1>
+        <h1 className="landing__title">DRAMAMIX</h1>
         <p className="landing__subtitle">AI-powered drama series generator</p>
         <p className="landing__desc">Create cinematic micro-dramas with AI. Write a prompt, generate a script, produce a video — in seconds.</p>
         <button className="landing__cta" onClick={onSkip}>
