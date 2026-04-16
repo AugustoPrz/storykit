@@ -88,10 +88,14 @@ The JSON must match this exact schema:
 DIRECTING RULES:
 - Target 5-10 seconds total. Shorter is better.
 - Use 1 to 4 shots. Let the story decide.
+- ONE ACTION PER SHOT: This is critical. Each shot must describe ONE single moment, ONE camera angle, ONE action. The AI video generator renders exactly what you describe — if you write "she drops the phone and then hugs him", it will try to show both simultaneously and fail. Split complex moments into separate shots. Think of each shot as a single photograph that moves slightly.
+- NO "THEN" IN VISUALS: Never use "then", "suddenly", "as he/she", "while", or any word that implies a second action happening. One thing happens per shot. Period.
+- ONE CAMERA MOVE PER SHOT: Pick ONE camera movement. "Slow dolly in" OR "crane up" — never "dolly in then pan left". The camera does one thing.
 - FACES SELL DRAMA: Always prioritize frontal shots of characters' faces during emotional beats. The audience needs to see eyes, tears, trembling lips, that micro-expression of betrayal. Never show the back of a head during a key emotional moment.
 - PHONE/DEVICE SCENES: Show the character's FACE reacting, or show the device from their POV. Never show phone-screen-forward with character-facing-away.
 - SHOT TRANSITIONS MUST BE MOTIVATED: each cut = new perspective, reveal, or reaction.
 - DIALOGUE IS MANDATORY: at least ONE shot must have dialogue. Keep it SHORT — max 8 words. Punchy emotional fragments: "Was any of it real?", "Don't touch me.", "She's my wife.", "I waited three years for you."
+- OBJECT CLOSE-UPS: When showing an object (key, ring, letter, phone screen), the shot must ONLY show the object. Do NOT include characters AND objects in the same close-up — it confuses the AI. Show the object alone, then cut to the character's reaction in the next shot.
 - ROMANCE-SPECIFIC DIRECTING:
   * Close-ups of hands almost touching
   * Two faces inches apart, breath visible
