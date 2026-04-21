@@ -1,4 +1,5 @@
 import { useClipsStore } from '../store/clips';
+import { useAuthStore } from '../store/auth';
 import { downloadVideo } from '../utils/download';
 import VideoPlayer from '../components/VideoPlayer';
 import './ClipPlayer.css';
@@ -11,9 +12,16 @@ interface Props {
 
 export default function ClipPlayer({ clipId, onClose, onContinue }: Props) {
   const clips = useClipsStore((s) => s.clips);
+  const publicClips = useClipsStore((s) => s.publicClips);
+  const userClips = useClipsStore((s) => s.userClips);
   const removeClip = useClipsStore((s) => s.removeClip);
+  const user = useAuthStore((s) => s.user);
 
-  const clip = clips.find((c) => c.id === clipId);
+  // Search all sources — local drafts, user clips, and public feed
+  const clip =
+    clips.find((c) => c.id === clipId) ||
+    userClips.find((c) => c.id === clipId) ||
+    publicClips.find((c) => c.id === clipId);
 
   if (!clip) {
     return (
@@ -24,6 +32,8 @@ export default function ClipPlayer({ clipId, onClose, onContinue }: Props) {
       </div>
     );
   }
+
+  const isOwner = !!(user && clip.userId && user.id === clip.userId);
 
   const handleDownload = () => {
     if (clip.videoUrl) {
@@ -76,17 +86,19 @@ export default function ClipPlayer({ clipId, onClose, onContinue }: Props) {
           <button className="player-modal__btn" onClick={handleDownload}>
             DOWNLOAD
           </button>
-          {onContinue && (
+          {isOwner && onContinue && (
             <button className="player-modal__btn player-modal__btn--accent" onClick={handleContinue}>
               CONTINUE STORY
             </button>
           )}
-          <button className="player-modal__btn-icon player-modal__btn-icon--danger" onClick={handleDelete} title="Delete">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="3 6 5 6 21 6" />
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-            </svg>
-          </button>
+          {isOwner && (
+            <button className="player-modal__btn-icon player-modal__btn-icon--danger" onClick={handleDelete} title="Delete">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
     </div>

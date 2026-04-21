@@ -1,15 +1,28 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ClipMetadata, ChatMessage, GenerationStatus } from '../services/video-generation/types';
+import {
+  fetchPublicClips,
+  fetchUserClips,
+  insertClip as supaInsertClip,
+  updateClip as supaUpdateClip,
+  deleteClip as supaDeleteClip,
+} from '../services/clips/supabase-clips';
 
 interface ClipsState {
+  // Session drafts (local only, not persisted past clearChat)
   clips: ClipMetadata[];
+  // All clips from Supabase (public feed — includes the user's own when logged in)
+  publicClips: ClipMetadata[];
+  // User's own clips (loaded when logged in, used for Mine filter + history)
+  userClips: ClipMetadata[];
+
   chatMessages: ChatMessage[];
   generationStatus: GenerationStatus;
   currentClipId: string | null;
   creditsUsed: number;
 
-  addClip: (clip: ClipMetadata) => void;
+  addClip: (clip: ClipMetadata, userId?: string) => void;
   updateClip: (id: string, updates: Partial<ClipMetadata>) => void;
   removeClip: (id: string) => void;
   addMessage: (message: ChatMessage) => void;
@@ -18,27 +31,67 @@ interface ClipsState {
   setGenerationStatus: (status: GenerationStatus) => void;
   setCurrentClipId: (id: string | null) => void;
   addCredits: (amount: number) => void;
+
+  loadPublicClips: () => Promise<void>;
+  loadUserClips: (userId: string) => Promise<void>;
+  clearUserClips: () => void;
 }
 
 export const useClipsStore = create<ClipsState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       clips: [],
+      publicClips: [],
+      userClips: [],
       chatMessages: [],
       generationStatus: { phase: 'idle', progress: 0, message: '' },
       currentClipId: null,
       creditsUsed: 0,
 
-      addClip: (clip) =>
-        set((state) => ({ clips: [clip, ...state.clips] })),
+      addClip: (clip, userId) => {
+        const withOwner = userId ? { ...clip, userId } : clip;
+        set((state) => ({ clips: [withOwner, ...state.clips] }));
+        // Only persist to Supabase when this is a NEW owned clip with a video
+        const alreadyInDb = get().userClips.some((c) => c.id === withOwner.id);
+        if (withOwner.videoUrl && userId && !alreadyInDb) {
+          supaInsertClip(withOwner, userId).catch((e) => console.error('[store] insert failed', e));
+        }
+      },
 
-      updateClip: (id, updates) =>
+      updateClip: (id, updates) => {
         set((state) => ({
           clips: state.clips.map((c) => (c.id === id ? { ...c, ...updates } : c)),
-        })),
+          userClips: state.userClips.map((c) => (c.id === id ? { ...c, ...updates } : c)),
+        }));
 
-      removeClip: (id) =>
-        set((state) => ({ clips: state.clips.filter((c) => c.id !== id) })),
+        const clip = get().clips.find((c) => c.id === id);
+        if (!clip) return;
+
+        // Persist to Supabase when clip has user + video
+        if (clip.userId && (clip.videoUrl || updates.videoUrl)) {
+          // If we're just now getting a videoUrl for the first time, insert instead of update
+          const isFirstVideo = updates.videoUrl && !get().userClips.find((c) => c.id === id);
+          if (isFirstVideo) {
+            const full = { ...clip, ...updates };
+            supaInsertClip(full, clip.userId).catch((e) => console.error('[store] insert failed', e));
+            set((state) => ({ userClips: [full, ...state.userClips] }));
+          } else {
+            supaUpdateClip(id, updates).catch((e) => console.error('[store] update failed', e));
+          }
+        }
+      },
+
+      removeClip: (id) => {
+        const clip = get().clips.find((c) => c.id === id) || get().userClips.find((c) => c.id === id);
+        set((state) => ({
+          clips: state.clips.filter((c) => c.id !== id),
+          userClips: state.userClips.filter((c) => c.id !== id),
+          publicClips: state.publicClips.filter((c) => c.id !== id),
+        }));
+        if (clip?.userId && clip.videoUrl) {
+          supaDeleteClip(id).catch((e) => console.error('[store] delete failed', e));
+        }
+      },
 
       addMessage: (message) =>
         set((state) => ({ chatMessages: [...state.chatMessages, message] })),
@@ -55,7 +108,7 @@ export const useClipsStore = create<ClipsState>()(
           chatMessages: [],
           generationStatus: { phase: 'idle', progress: 0, message: '' },
           currentClipId: null,
-          // Remove clips without videos (draft scripts from this session)
+          // Remove draft clips (no video) from local session
           clips: state.clips.filter((c) => c.videoUrl),
         })),
 
@@ -67,10 +120,22 @@ export const useClipsStore = create<ClipsState>()(
 
       addCredits: (amount) =>
         set((state) => ({ creditsUsed: state.creditsUsed + amount })),
+
+      loadPublicClips: async () => {
+        const clips = await fetchPublicClips();
+        set({ publicClips: clips });
+      },
+
+      loadUserClips: async (userId) => {
+        const clips = await fetchUserClips(userId);
+        set({ userClips: clips });
+      },
+
+      clearUserClips: () => set({ userClips: [] }),
     }),
     {
-      name: 'storykit-clips',
-      partialize: (state) => ({ clips: state.clips, creditsUsed: state.creditsUsed }),
+      name: 'dramamix-clips',
+      partialize: (state) => ({ creditsUsed: state.creditsUsed }),
     }
   )
 );

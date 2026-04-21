@@ -129,6 +129,12 @@
   gap: 4px;
 }
 
+.create__right-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
 .create__prompt-overlay {
   position: fixed;
   inset: 0;

@@ -1,10 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useClipsStore } from '../store/clips';
+import { useAuthStore } from '../store/auth';
 import { generateScript } from '../services/storytelling/gemini';
 import { buildPrompt } from '../services/storytelling/prompts';
 import { generateVideo } from '../services/video-generation';
 import { extractLastFrame } from '../utils/extractFrame';
+import { fetchStoryChain } from '../services/clips/supabase-clips';
 import ChatMessage from '../components/ChatMessage';
+import StoryHistoryDropdown from '../components/StoryHistoryDropdown';
 import type { ChatMessage as ChatMessageType } from '../services/video-generation/types';
 import type { AppView } from '../App';
 import './Create.css';
@@ -18,8 +21,10 @@ interface Props {
 export default function Create({ onViewChange, continueFromClipId, onContinueHandled }: Props) {
   const [input, setInput] = useState('');
   const [showPrompt, setShowPrompt] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const user = useAuthStore((s) => s.user);
 
   const {
     chatMessages,
@@ -52,9 +57,10 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
       if (clip?.script) {
         // Clear chat and set up the clip as the current context
         clearChat();
-        // Re-add the clip with its video as the starting point
+        // Re-add the clip with its video as the starting point (no userId: don't re-insert)
         addClip({
           id: clip.id,
+          userId: clip.userId,
           title: clip.title,
           prompt: clip.prompt,
           script: clip.script,
@@ -161,7 +167,7 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
         createdAt: new Date().toISOString(),
         style: script.style,
         parentClipId: currentClipId || undefined,
-      });
+      }, user?.id);
       setCurrentClipId(clipId);
       setGenerationStatus({ phase: 'idle', progress: 0, message: '' });
     } catch (err) {
@@ -258,6 +264,48 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
     inputRef.current?.focus();
   };
 
+  const handleLoadStory = async (rootClipId: string) => {
+    if (!user) return;
+    const chain = await fetchStoryChain(rootClipId, user.id);
+    if (chain.length === 0) return;
+    clearChat();
+    // Rehydrate chat: each clip becomes an assistant message with its script + video
+    chain.forEach((clip) => {
+      // Re-add clip to store without re-inserting to DB
+      addClip({
+        id: clip.id,
+        userId: clip.userId,
+        title: clip.title,
+        prompt: clip.prompt,
+        script: clip.script,
+        videoUrl: clip.videoUrl,
+        thumbnailUrl: clip.thumbnailUrl,
+        duration: clip.duration,
+        createdAt: clip.createdAt,
+        style: clip.style,
+        parentClipId: clip.parentClipId,
+      });
+      // User prompt message
+      addMessage({
+        id: crypto.randomUUID(),
+        role: 'user',
+        content: clip.prompt || '',
+        timestamp: new Date(clip.createdAt).getTime(),
+      });
+      // Assistant message with the script
+      addMessage({
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: '',
+        timestamp: new Date(clip.createdAt).getTime() + 1,
+        script: clip.script,
+        clipId: clip.id,
+      });
+    });
+    // Set current clip to the last in chain (the tip you can continue from)
+    setCurrentClipId(chain[chain.length - 1].id);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -286,9 +334,19 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
             </svg>
           </button>
         </div>
-        {chatMessages.length > 0 && (
-          <button className="create__new" onClick={handleNew}>NEW</button>
-        )}
+        <div className="create__right-actions">
+          {user && (
+            <button className="create__switch-btn" onClick={() => setShowHistory(true)} title="Story history">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+            </button>
+          )}
+          {chatMessages.length > 0 && (
+            <button className="create__new" onClick={handleNew}>NEW</button>
+          )}
+        </div>
       </div>
 
       <div className="create__messages">
@@ -351,6 +409,14 @@ export default function Create({ onViewChange, continueFromClipId, onContinueHan
           </button>
         </div>
       </div>
+
+      {showHistory && user && (
+        <StoryHistoryDropdown
+          userId={user.id}
+          onSelectStory={handleLoadStory}
+          onClose={() => setShowHistory(false)}
+        />
+      )}
 
       {showPrompt && (
         <div className="create__prompt-overlay" onClick={() => setShowPrompt(false)}>

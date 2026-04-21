@@ -16,11 +16,32 @@
   flex-shrink: 0;
 }
 
+.app-header__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .app-credits {
   font-family: var(--mono);
   font-size: 9px;
   letter-spacing: 1px;
   color: var(--dim);
+}
+
+.app-auth-btn {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--dim);
+  padding: 4px 10px;
+  border: 0.5px solid var(--border);
+  transition: all 150ms linear;
+}
+
+.app-auth-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 .app-title {

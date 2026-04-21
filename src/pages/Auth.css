@@ -1,0 +1,137 @@
+.auth {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0 20px;
+}
+
+.auth__actions {
+  display: flex;
+  justify-content: flex-start;
+  padding: 8px 0;
+  min-height: 32px;
+}
+
+.auth__back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--dim);
+  transition: color 150ms linear;
+}
+
+.auth__back:hover {
+  color: var(--text);
+}
+
+.auth__box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 360px;
+  width: 100%;
+  margin: 0 auto;
+  padding-bottom: 60px;
+}
+
+.auth__tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.auth__tab {
+  flex: 1;
+  padding: 12px 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--dim);
+  transition: color 150ms linear;
+}
+
+.auth__tab--active {
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent);
+  margin-bottom: -1px;
+}
+
+.auth__tab:hover:not(.auth__tab--active) {
+  color: var(--text);
+}
+
+.auth__form {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth__label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--dim);
+  margin-bottom: 6px;
+  margin-top: 12px;
+}
+
+.auth__input {
+  font-family: var(--mono);
+  font-size: 16px;
+  color: var(--text);
+  background: var(--border);
+  border-radius: 26px;
+  padding: 12px 16px;
+  transition: background 150ms linear;
+}
+
+.auth__input:focus {
+  background: #2a2a2a;
+  outline: none;
+}
+
+.auth__input::placeholder {
+  color: var(--dim);
+}
+
+.auth__error {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--accent);
+  margin-top: 14px;
+  word-break: break-word;
+}
+
+.auth__info {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--text);
+  margin-top: 14px;
+  word-break: break-word;
+}
+
+.auth__submit {
+  margin-top: 24px;
+  padding: 14px;
+  background: var(--accent);
+  color: #000;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  border-radius: 30px;
+  transition: opacity 150ms linear;
+}
+
+.auth__submit:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.auth__submit:disabled {
+  opacity: 0.3;
+}

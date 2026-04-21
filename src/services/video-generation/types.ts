@@ -28,6 +28,7 @@ export interface Script {
 
 export interface ClipMetadata {
   id: string;
+  userId?: string;
   title: string;
   prompt: string;
   script: Script;
